@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { Suspense, useMemo, useState } from "react";
+import { queryOptions, useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -52,34 +52,32 @@ const npiQuery = queryOptions({
 });
 
 export const Route = createFileRoute("/")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(npiQuery),
   component: DashboardPage,
-  errorComponent: ({ error, reset }) => (
-    <div className="flex min-h-screen items-center justify-center p-6 text-center">
-      <div>
-        <h2 className="text-xl font-semibold">โหลดข้อมูลไม่สำเร็จ</h2>
-        <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
-        <Button onClick={reset} className="mt-4">
-          <RefreshCw className="mr-2 h-4 w-4" /> ลองอีกครั้ง
-        </Button>
-      </div>
-    </div>
-  ),
-  pendingComponent: () => <DashboardSkeleton />,
 });
 
 const ALL = "__all__";
 
 function DashboardPage() {
-  return (
-    <Suspense fallback={<DashboardSkeleton />}>
-      <Dashboard />
-    </Suspense>
-  );
+  return <Dashboard />;
 }
 
 function Dashboard() {
-  const { data: rows, isFetching, refetch } = useSuspenseQuery(npiQuery);
+  const { data, isFetching, isLoading, refetch, error } = useQuery(npiQuery);
+  const rows: NpiRow[] = data ?? [];
+
+  if (isLoading) return <DashboardSkeleton />;
+  if (error)
+    return (
+      <div className="flex min-h-screen items-center justify-center p-6 text-center">
+        <div>
+          <h2 className="text-xl font-semibold">โหลดข้อมูลไม่สำเร็จ</h2>
+          <p className="mt-2 text-sm text-muted-foreground">{(error as Error).message}</p>
+          <Button onClick={() => refetch()} className="mt-4">
+            <RefreshCw className="mr-2 h-4 w-4" /> ลองอีกครั้ง
+          </Button>
+        </div>
+      </div>
+    );
 
   const [year, setYear] = useState<string>(ALL);
   const [country, setCountry] = useState<string>(ALL);
