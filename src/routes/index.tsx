@@ -5,9 +5,12 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
   Legend,
   Line,
   LineChart,
+  Pie,
+  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -107,11 +110,10 @@ function Dashboard() {
   );
 
   const chartData = useMemo(() => {
-    const map = new Map<string, { YearMonth: string; Quantity: number; Count: number }>();
+    const map = new Map<string, { YearMonth: string; Count: number }>();
     for (const r of filtered) {
       const k = r.YearMonth || "Unknown";
-      const cur = map.get(k) ?? { YearMonth: k, Quantity: 0, Count: 0 };
-      cur.Quantity += r.Quantity;
+      const cur = map.get(k) ?? { YearMonth: k, Count: 0 };
       cur.Count += 1;
       map.set(k, cur);
     }
@@ -223,82 +225,86 @@ function Dashboard() {
           />
         </div>
 
-        {/* Chart */}
-        <Card className="p-5">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold">Quantity by Month</h2>
-              <p className="text-xs text-muted-foreground">
-                แยกตาม YearMonth ตามตัวกรองที่เลือก
-              </p>
+        {/* Charts */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* Product Count Chart */}
+          <Card className="p-5">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold">Product Count by Month</h2>
+                <p className="text-xs text-muted-foreground">
+                  จำนวน Product ต่อเดือน ตามตัวกรองที่เลือก
+                </p>
+              </div>
+              <div className="flex gap-1 rounded-md border p-0.5">
+                <button
+                  onClick={() => setChartType("bar")}
+                  className={`rounded px-3 py-1 text-xs font-medium transition ${
+                    chartType === "bar"
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Bar
+                </button>
+                <button
+                  onClick={() => setChartType("line")}
+                  className={`rounded px-3 py-1 text-xs font-medium transition ${
+                    chartType === "line"
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Line
+                </button>
+              </div>
             </div>
-            <div className="flex gap-1 rounded-md border p-0.5">
-              <button
-                onClick={() => setChartType("bar")}
-                className={`rounded px-3 py-1 text-xs font-medium transition ${
-                  chartType === "bar"
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Bar
-              </button>
-              <button
-                onClick={() => setChartType("line")}
-                className={`rounded px-3 py-1 text-xs font-medium transition ${
-                  chartType === "line"
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Line
-              </button>
-            </div>
-          </div>
-          {chartData.length === 0 ? (
-            <EmptyState />
-          ) : (
-            <div className="h-[340px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                {chartType === "bar" ? (
-                  <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                    <XAxis dataKey="YearMonth" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
-                    <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
-                    <Tooltip
-                      contentStyle={{
-                        background: "var(--popover)",
-                        border: "1px solid var(--border)",
-                        borderRadius: 8,
-                        fontFamily: "Kanit",
-                      }}
-                    />
-                    <Legend />
-                    <Bar dataKey="Quantity" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="Count" fill="var(--chart-2)" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                ) : (
-                  <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                    <XAxis dataKey="YearMonth" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
-                    <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
-                    <Tooltip
-                      contentStyle={{
-                        background: "var(--popover)",
-                        border: "1px solid var(--border)",
-                        borderRadius: 8,
-                        fontFamily: "Kanit",
-                      }}
-                    />
-                    <Legend />
-                    <Line type="monotone" dataKey="Quantity" stroke="var(--chart-1)" strokeWidth={2} dot={{ r: 3 }} />
-                    <Line type="monotone" dataKey="Count" stroke="var(--chart-2)" strokeWidth={2} dot={{ r: 3 }} />
-                  </LineChart>
-                )}
-              </ResponsiveContainer>
-            </div>
-          )}
-        </Card>
+            {chartData.length === 0 ? (
+              <EmptyState />
+            ) : (
+              <div className="h-[340px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  {chartType === "bar" ? (
+                    <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                      <XAxis dataKey="YearMonth" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
+                      <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
+                      <Tooltip
+                        contentStyle={{
+                          background: "var(--popover)",
+                          border: "1px solid var(--border)",
+                          borderRadius: 8,
+                          fontFamily: "Kanit",
+                        }}
+                      />
+                      <Legend />
+                      <Bar dataKey="Count" name="Products" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  ) : (
+                    <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                      <XAxis dataKey="YearMonth" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
+                      <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
+                      <Tooltip
+                        contentStyle={{
+                          background: "var(--popover)",
+                          border: "1px solid var(--border)",
+                          borderRadius: 8,
+                          fontFamily: "Kanit",
+                        }}
+                      />
+                      <Legend />
+                      <Line type="monotone" dataKey="Count" name="Products" stroke="var(--chart-1)" strokeWidth={2} dot={{ r: 3 }} />
+                    </LineChart>
+                  )}
+                </ResponsiveContainer>
+              </div>
+            )}
+          </Card>
+
+          {/* Status Pie Chart */}
+          <StatusPieChart rows={filtered} />
+        </div>
 
         {/* Table */}
         <DataTable rows={filtered} />
@@ -546,6 +552,66 @@ function EmptyState() {
         ไม่มีรายการที่ตรงกับตัวกรองที่เลือก ลองปรับหรือล้างตัวกรองเพื่อดูผลลัพธ์อื่น
       </p>
     </div>
+  );
+}
+
+function StatusPieChart({ rows }: { rows: NpiRow[] }) {
+  const data = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const r of rows) {
+      const s = r.Status || "Unknown";
+      map.set(s, (map.get(s) || 0) + 1);
+    }
+    return Array.from(map.entries())
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value);
+  }, [rows]);
+
+  const COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
+
+  return (
+    <Card className="p-5">
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold">Status Distribution</h2>
+        <p className="text-xs text-muted-foreground">
+          สัดส่วนสถานะของ Product ตามตัวกรองที่เลือก
+        </p>
+      </div>
+      {data.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <div className="h-[340px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Tooltip
+                contentStyle={{
+                  background: "var(--popover)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 8,
+                  fontFamily: "Kanit",
+                }}
+                formatter={(value: number, name: string) => [`${value.toLocaleString()} รายการ`, name]}
+              />
+              <Legend />
+              <Pie
+                data={data}
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                dataKey="value"
+                nameKey="name"
+                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                labelLine
+              >
+                {data.map((_, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+    </Card>
   );
 }
 
