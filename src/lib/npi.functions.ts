@@ -16,21 +16,30 @@ export interface NpiRow {
   Delivery: string;
 }
 
+// Bangkok timezone (GMT+7) — Google Apps Script serializes dates to UTC,
+// shifting Thai-local dates back by 7 hours. Re-apply the offset before
+// extracting year/month so e.g. 2023-12-31T17:00:00Z → 2024-01.
+const TZ_OFFSET_MS = 7 * 60 * 60 * 1000;
+
+function ymFromDate(d: Date): string {
+  const shifted = new Date(d.getTime() + TZ_OFFSET_MS);
+  return `${shifted.getUTCFullYear()}-${String(shifted.getUTCMonth() + 1).padStart(2, "0")}`;
+}
+
 function normalizeYearMonth(v: unknown): string {
   if (v == null) return "";
   if (typeof v === "number") {
     // Excel serial date (days since 1899-12-30)
     const ms = (v - 25569) * 86400 * 1000;
     const d = new Date(ms);
-    if (!isNaN(d.getTime())) {
-      return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
-    }
+    if (!isNaN(d.getTime())) return ymFromDate(d);
   }
   if (typeof v === "string") {
+    // Already in YYYY-MM form
+    const ym = v.match(/^(\d{4})-(\d{2})$/);
+    if (ym) return v;
     const d = new Date(v);
-    if (!isNaN(d.getTime())) {
-      return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
-    }
+    if (!isNaN(d.getTime())) return ymFromDate(d);
     return v;
   }
   return String(v);
