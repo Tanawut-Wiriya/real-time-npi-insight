@@ -123,14 +123,9 @@ function Dashboard() {
   }, [filtered]);
 
   const totalQty = filtered.reduce((s, r) => s + r.Quantity, 0);
-  const deliveredRows = useMemo(
-    () => filtered.filter((r) => /deliver/i.test(r.Status)),
+  const delivered = useMemo(
+    () => filtered.filter((r) => /deliver/i.test(r.Status)).length,
     [filtered],
-  );
-  const delivered = deliveredRows.length;
-  const deliveredProducts = useMemo(
-    () => new Set(deliveredRows.map((r) => r.Product)).size,
-    [deliveredRows],
   );
   const onTime = filtered.filter((r) => /on time/i.test(r.Delivery)).length;
 
