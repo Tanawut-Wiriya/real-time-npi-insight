@@ -566,7 +566,7 @@ function EmptyState() {
   );
 }
 
-function StatusPieChart({ rows }: { rows: NpiRow[] }) {
+function StatusPieChart({ rows, delivered }: { rows: NpiRow[]; delivered: number }) {
   const data = useMemo(() => {
     const map = new Map<string, number>();
     for (const r of rows) {
@@ -578,15 +578,31 @@ function StatusPieChart({ rows }: { rows: NpiRow[] }) {
       .sort((a, b) => b.value - a.value);
   }, [rows]);
 
+  const total = data.reduce((s, d) => s + d.value, 0);
+  const deliveredPct = total > 0 ? (delivered / total) * 100 : 0;
+
   const COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
 
   return (
     <Card className="p-5">
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold">Status Distribution</h2>
-        <p className="text-xs text-muted-foreground">
-          สัดส่วนสถานะของ Product ตามตัวกรองที่เลือก
-        </p>
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-semibold">Status Distribution</h2>
+          <p className="text-xs text-muted-foreground">
+            สัดส่วนสถานะของ Product ตามตัวกรองที่เลือก
+          </p>
+        </div>
+        <div className="rounded-md border bg-secondary/40 px-3 py-2 text-right">
+          <div className="flex items-center justify-end gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <Truck className="h-3.5 w-3.5" /> Delivered
+          </div>
+          <div className="text-xl font-semibold tabular-nums">
+            {delivered.toLocaleString()}
+            <span className="ml-1 text-xs font-normal text-muted-foreground">
+              ({deliveredPct.toFixed(1)}%)
+            </span>
+          </div>
+        </div>
       </div>
       {data.length === 0 ? (
         <EmptyState />
@@ -619,6 +635,65 @@ function StatusPieChart({ rows }: { rows: NpiRow[] }) {
                 ))}
               </Pie>
             </PieChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+    </Card>
+  );
+}
+
+function FeedbackChart({ rows }: { rows: NpiRow[] }) {
+  const data = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const r of rows) {
+      const fb = (r.CustomerFeedback || "").trim();
+      if (!fb || fb === "-") continue;
+      map.set(fb, (map.get(fb) || 0) + 1);
+    }
+    return Array.from(map.entries())
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 15);
+  }, [rows]);
+
+  return (
+    <Card className="p-5">
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold">Customer Feedback</h2>
+        <p className="text-xs text-muted-foreground">
+          จำนวนรายการตามประเภท Customer feedback (สูงสุด 15 อันดับ)
+        </p>
+      </div>
+      {data.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <div className="w-full" style={{ height: Math.max(260, data.length * 36) }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={data}
+              layout="vertical"
+              margin={{ top: 10, right: 24, left: 10, bottom: 10 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
+              <XAxis type="number" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" allowDecimals={false} />
+              <YAxis
+                type="category"
+                dataKey="name"
+                width={180}
+                tick={{ fontSize: 12 }}
+                stroke="var(--muted-foreground)"
+              />
+              <Tooltip
+                contentStyle={{
+                  background: "var(--popover)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 8,
+                  fontFamily: "Kanit",
+                }}
+                formatter={(value: number) => [`${value.toLocaleString()} รายการ`, "Count"]}
+              />
+              <Bar dataKey="value" name="Records" fill="var(--chart-2)" radius={[0, 4, 4, 0]} />
+            </BarChart>
           </ResponsiveContainer>
         </div>
       )}
