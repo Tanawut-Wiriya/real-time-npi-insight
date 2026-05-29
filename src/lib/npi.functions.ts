@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
 const DATA_URL =
-  "https://script.googleusercontent.com/macros/echo?user_content_key=AUkAhnQsEgM8cbTtaVHLSGf_rqwapztuBhAXuslw6-9NoYRdReu73s3ZnFxHlFWSDA82A3po2lQoDgByjgqCo3LLCwfb_kZr4BzUVVqG0wFudAt2UwzZEtkWqNSxG8GnI6HD9XNs357wBI0I2tYml4FuQIB20avi1oNJV-leIZrC57VvcZizvcUFCGQqt19rBeSCqC4Bi6Wn1reReJpq0JZohFMaUBzMbkvLYBUNO4S4EAkpniuP6untmVXd3y0jiEZEhPABWvlT8pEENe88cGCbof9U9s251w&lib=M0bGm-_Zb3kJTDfZ7cThr5KrVZfHLKP8z";
+  "https://script.google.com/macros/s/AKfycbwPSu_uio1JWCVoz2fa-d6jdj-sfDqa1vl02dQuYiGjthEcEXm3lZt1vaVNx3BdVWyppg/exec";
 
 export interface NpiRow {
   No: number;
@@ -14,6 +14,7 @@ export interface NpiRow {
   YearMonth: string; // normalized "YYYY-MM"
   Status: string;
   Delivery: string;
+  CustomerFeedback: string;
 }
 
 // Bangkok timezone (GMT+7) — Google Apps Script serializes dates to UTC,
