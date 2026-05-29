@@ -123,7 +123,15 @@ function Dashboard() {
   }, [filtered]);
 
   const totalQty = filtered.reduce((s, r) => s + r.Quantity, 0);
-  const delivered = filtered.filter((r) => /deliver/i.test(r.Status)).length;
+  const deliveredRows = useMemo(
+    () => filtered.filter((r) => /deliver/i.test(r.Status)),
+    [filtered],
+  );
+  const delivered = deliveredRows.length;
+  const deliveredProducts = useMemo(
+    () => new Set(deliveredRows.map((r) => r.Product)).size,
+    [deliveredRows],
+  );
   const onTime = filtered.filter((r) => /on time/i.test(r.Delivery)).length;
 
   const [chartType, setChartType] = useState<"bar" | "line">("bar");
@@ -217,7 +225,9 @@ function Dashboard() {
             label="Delivered"
             value={delivered.toLocaleString()}
             icon={<Truck className="h-4 w-4" />}
+            subValue={`${deliveredProducts.toLocaleString()} products`}
           />
+
           <KpiCard
             label="On-Time"
             value={onTime.toLocaleString()}
@@ -348,10 +358,12 @@ function KpiCard({
   label,
   value,
   icon,
+  subValue,
 }: {
   label: string;
   value: string;
   icon: React.ReactNode;
+  subValue?: string;
 }) {
   return (
     <Card className="p-4">
@@ -362,6 +374,9 @@ function KpiCard({
         <span className="rounded-md bg-secondary p-1.5 text-primary">{icon}</span>
       </div>
       <div className="mt-2 text-2xl font-semibold tracking-tight">{value}</div>
+      {subValue && (
+        <div className="mt-1 text-xs text-muted-foreground">{subValue}</div>
+      )}
     </Card>
   );
 }
@@ -414,6 +429,7 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
     { key: "YearMonth", label: "YearMonth" },
     { key: "Status", label: "Status" },
     { key: "Delivery", label: "Delivery" },
+    { key: "CustomerFeedback", label: "Customer Feedback" },
   ];
 
   return (
@@ -479,6 +495,12 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
                     </TableCell>
                     <TableCell>
                       <DeliveryBadge value={r.Delivery} />
+                    </TableCell>
+                    <TableCell
+                      className="max-w-[260px] truncate text-sm text-muted-foreground"
+                      title={r.CustomerFeedback}
+                    >
+                      {r.CustomerFeedback || "-"}
                     </TableCell>
                   </TableRow>
                 ))}
