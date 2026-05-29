@@ -306,8 +306,11 @@ function Dashboard() {
           </Card>
 
           {/* Status Pie Chart */}
-          <StatusPieChart rows={filtered} />
+          <StatusPieChart rows={filtered} delivered={delivered} />
         </div>
+
+        {/* Customer Feedback Chart */}
+        <FeedbackChart rows={filtered} />
 
         {/* Table */}
         <DataTable rows={filtered} />
