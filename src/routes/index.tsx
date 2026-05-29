@@ -358,10 +358,12 @@ function KpiCard({
   label,
   value,
   icon,
+  subValue,
 }: {
   label: string;
   value: string;
   icon: React.ReactNode;
+  subValue?: string;
 }) {
   return (
     <Card className="p-4">
@@ -372,6 +374,9 @@ function KpiCard({
         <span className="rounded-md bg-secondary p-1.5 text-primary">{icon}</span>
       </div>
       <div className="mt-2 text-2xl font-semibold tracking-tight">{value}</div>
+      {subValue && (
+        <div className="mt-1 text-xs text-muted-foreground">{subValue}</div>
+      )}
     </Card>
   );
 }
