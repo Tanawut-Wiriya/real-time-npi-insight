@@ -67,6 +67,8 @@ export const getNpiData = createServerFn({ method: "GET" }).handler(
       YearMonth: normalizeYearMonth(r.YearMonth),
       Status: clean(r.Status),
       Delivery: clean(r.Delivery),
+      CustomerFeedback: String(r["Customer feedback"] ?? r.CustomerFeedback ?? "").trim(),
+    }));
     }));
   },
 );
