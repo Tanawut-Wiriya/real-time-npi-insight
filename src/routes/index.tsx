@@ -492,6 +492,7 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
                     <TableCell className="whitespace-nowrap">{r.YearMonth}</TableCell>
                     <TableCell>
                       <StatusBadge value={r.Status} />
+                    </TableCell>
                     <TableCell>
                       <DeliveryBadge value={r.Delivery} />
                     </TableCell>
@@ -501,8 +502,6 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
                     >
                       {r.CustomerFeedback || "-"}
                     </TableCell>
-                  </TableRow>
-
                   </TableRow>
                 ))}
               </TableBody>
