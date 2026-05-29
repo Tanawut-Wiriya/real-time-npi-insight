@@ -582,7 +582,7 @@ function StatusPieChart({ rows, delivered }: { rows: NpiRow[]; delivered: number
     <Card className="p-5">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold">Status Distribution</h2>
+          <h2 className="text-lg font-semibold">Status of product</h2>
           <p className="text-xs text-muted-foreground">
             สัดส่วนสถานะของ Product ตามตัวกรองที่เลือก
           </p>
