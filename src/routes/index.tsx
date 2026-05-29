@@ -225,7 +225,9 @@ function Dashboard() {
             label="Delivered"
             value={delivered.toLocaleString()}
             icon={<Truck className="h-4 w-4" />}
+            subValue={`${deliveredProducts.toLocaleString()} products`}
           />
+
           <KpiCard
             label="On-Time"
             value={onTime.toLocaleString()}
