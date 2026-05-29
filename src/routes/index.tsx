@@ -429,6 +429,7 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
     { key: "YearMonth", label: "YearMonth" },
     { key: "Status", label: "Status" },
     { key: "Delivery", label: "Delivery" },
+    { key: "CustomerFeedback", label: "Customer Feedback" },
   ];
 
   return (
