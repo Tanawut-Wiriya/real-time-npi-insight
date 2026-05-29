@@ -69,6 +69,5 @@ export const getNpiData = createServerFn({ method: "GET" }).handler(
       Delivery: clean(r.Delivery),
       CustomerFeedback: String(r["Customer feedback"] ?? r.CustomerFeedback ?? "").trim(),
     }));
-    }));
   },
 );
