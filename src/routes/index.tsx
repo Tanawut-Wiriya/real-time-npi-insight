@@ -97,6 +97,18 @@ function Dashboard() {
   const statuses = useMemo(() => uniq(rows.map((r) => r.Status)), [rows]);
   const products = useMemo(() => uniq(rows.map((r) => r.Product)), [rows]);
 
+  // Default to the latest year on first load
+  const [yearInitialized, setYearInitialized] = useState(false);
+  useEffect(() => {
+    if (yearInitialized || years.length === 0) return;
+    const latest = years
+      .map((y) => Number(y))
+      .filter((n) => !isNaN(n))
+      .sort((a, b) => b - a)[0];
+    if (latest != null) setYear(String(latest));
+    setYearInitialized(true);
+  }, [years, yearInitialized]);
+
   const filtered = useMemo(
     () =>
       rows.filter(
