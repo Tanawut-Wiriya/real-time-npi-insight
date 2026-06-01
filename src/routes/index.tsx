@@ -318,7 +318,7 @@ function Dashboard() {
           </Card>
 
           {/* Status Pie Chart */}
-          <StatusPieChart rows={filtered} delivered={delivered} />
+          <StatusPieChart rows={filtered} />
         </div>
 
         {/* Customer Feedback Chart */}
