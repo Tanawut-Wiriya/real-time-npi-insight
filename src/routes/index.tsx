@@ -83,7 +83,7 @@ function Dashboard() {
     );
 
   const [year, setYear] = useState<string>(ALL);
-  const [country, setCountry] = useState<string>(ALL);
+  const [month, setMonth] = useState<string>(ALL);
   const [status, setStatus] = useState<string>(ALL);
   const [product, setProduct] = useState<string>(ALL);
 
@@ -93,7 +93,15 @@ function Dashboard() {
     );
 
   const years = useMemo(() => uniq(rows.map((r) => r.Year)), [rows]);
-  const countries = useMemo(() => uniq(rows.map((r) => r.Country)), [rows]);
+  const months = useMemo(
+    () =>
+      uniq(
+        rows
+          .map((r) => r.YearMonth?.split("-")[1])
+          .filter((m): m is string => !!m),
+      ),
+    [rows],
+  );
   const statuses = useMemo(() => uniq(rows.map((r) => r.Status)), [rows]);
   const products = useMemo(() => uniq(rows.map((r) => r.Product)), [rows]);
 
@@ -114,12 +122,13 @@ function Dashboard() {
       rows.filter(
         (r) =>
           (year === ALL || String(r.Year) === year) &&
-          (country === ALL || r.Country === country) &&
+          (month === ALL || r.YearMonth?.split("-")[1] === month) &&
           (status === ALL || r.Status === status) &&
           (product === ALL || r.Product === product),
       ),
-    [rows, year, country, status, product],
+    [rows, year, month, status, product],
   );
+
 
   const chartData = useMemo(() => {
     const map = new Map<string, { YearMonth: string; Count: number }>();
