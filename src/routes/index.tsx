@@ -217,7 +217,7 @@ function Dashboard() {
         </Card>
 
         {/* KPIs */}
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <KpiCard
             label="Total Projects"
             value={filtered.length.toLocaleString()}
@@ -227,6 +227,11 @@ function Dashboard() {
             label="Total Quantity"
             value={totalQty.toLocaleString()}
             icon={<BarChart3 className="h-4 w-4" />}
+          />
+          <KpiCard
+            label="Delivered"
+            value={delivered.toLocaleString()}
+            icon={<Truck className="h-4 w-4" />}
           />
           <KpiCard
             label="On-Time"
