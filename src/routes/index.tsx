@@ -589,7 +589,7 @@ function StatusPieChart({ rows, delivered }: { rows: NpiRow[]; delivered: number
         </div>
         <div className="rounded-md border bg-secondary/40 px-3 py-2 text-right">
           <div className="flex items-center justify-end gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            <Truck className="h-3.5 w-3.5" /> Delivered
+            <Truck className="h-3.5 w-3.5" /> STATUS
           </div>
           <div className="text-xl font-semibold tabular-nums">
             {delivered.toLocaleString()}
