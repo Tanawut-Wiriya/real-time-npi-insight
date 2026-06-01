@@ -207,7 +207,7 @@ function Dashboard() {
         {/* KPIs */}
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
           <KpiCard
-            label="Total Records"
+            label="Total Projects"
             value={filtered.length.toLocaleString()}
             icon={<Package className="h-4 w-4" />}
           />
@@ -229,9 +229,9 @@ function Dashboard() {
           <Card className="p-5">
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold">Product Count by Month</h2>
+                <h2 className="text-lg font-semibold">Projects Count by Month</h2>
                 <p className="text-xs text-muted-foreground">
-                  จำนวน Product ต่อเดือน ตามตัวกรองที่เลือก
+                  จำนวน Project ต่อเดือน ตามตัวกรองที่เลือก
                 </p>
               </div>
               <div className="flex gap-1 rounded-md border p-0.5">
