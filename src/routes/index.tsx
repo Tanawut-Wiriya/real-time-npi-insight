@@ -416,9 +416,9 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
     { key: "Country", label: "Country" },
     { key: "Article", label: "Article" },
     { key: "Description", label: "Description" },
-    { key: "Delivery", label: "Delivery" },
-    { key: "Status", label: "Status" },
-    { key: "Delivery", label: "Delivery" },
+    { key: "Quantity", label: "QTY." },
+    { key: "Status", label: "START DATE" },
+    { key: "Delivery", label: "STATUS" },
     { key: "CustomerFeedback", label: "Customer Feedback" },
   ];
 
