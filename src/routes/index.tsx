@@ -606,7 +606,7 @@ function StatusPieChart({ rows }: { rows: NpiRow[] }) {
   return (
     <Card className="p-5">
       <div className="mb-4">
-        <h2 className="text-lg font-semibold">Status of product</h2>
+        <h2 className="text-lg font-semibold">Status of projects</h2>
         <p className="text-xs text-muted-foreground">
           สัดส่วนสถานะของ Product ตามตัวกรองที่เลือก
         </p>
