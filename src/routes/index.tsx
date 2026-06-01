@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -96,6 +96,18 @@ function Dashboard() {
   const countries = useMemo(() => uniq(rows.map((r) => r.Country)), [rows]);
   const statuses = useMemo(() => uniq(rows.map((r) => r.Status)), [rows]);
   const products = useMemo(() => uniq(rows.map((r) => r.Product)), [rows]);
+
+  // Default to the latest year on first load
+  const [yearInitialized, setYearInitialized] = useState(false);
+  useEffect(() => {
+    if (yearInitialized || years.length === 0) return;
+    const latest = years
+      .map((y) => Number(y))
+      .filter((n) => !isNaN(n))
+      .sort((a, b) => b - a)[0];
+    if (latest != null) setYear(String(latest));
+    setYearInitialized(true);
+  }, [years, yearInitialized]);
 
   const filtered = useMemo(
     () =>
@@ -205,7 +217,7 @@ function Dashboard() {
         </Card>
 
         {/* KPIs */}
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <KpiCard
             label="Total Projects"
             value={filtered.length.toLocaleString()}
@@ -215,6 +227,11 @@ function Dashboard() {
             label="Total Quantity"
             value={totalQty.toLocaleString()}
             icon={<BarChart3 className="h-4 w-4" />}
+          />
+          <KpiCard
+            label="Delivered"
+            value={delivered.toLocaleString()}
+            icon={<Truck className="h-4 w-4" />}
           />
           <KpiCard
             label="On-Time"
@@ -301,7 +318,7 @@ function Dashboard() {
           </Card>
 
           {/* Status Pie Chart */}
-          <StatusPieChart rows={filtered} delivered={delivered} />
+          <StatusPieChart rows={filtered} />
         </div>
 
         {/* Customer Feedback Chart */}
@@ -561,7 +578,7 @@ function EmptyState() {
   );
 }
 
-function StatusPieChart({ rows, delivered }: { rows: NpiRow[]; delivered: number }) {
+function StatusPieChart({ rows }: { rows: NpiRow[] }) {
   const data = useMemo(() => {
     const map = new Map<string, number>();
     for (const r of rows) {
@@ -573,31 +590,15 @@ function StatusPieChart({ rows, delivered }: { rows: NpiRow[]; delivered: number
       .sort((a, b) => b.value - a.value);
   }, [rows]);
 
-  const total = data.reduce((s, d) => s + d.value, 0);
-  const deliveredPct = total > 0 ? (delivered / total) * 100 : 0;
-
   const COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
 
   return (
     <Card className="p-5">
-      <div className="mb-4 flex items-start justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-semibold">Status of product</h2>
-          <p className="text-xs text-muted-foreground">
-            สัดส่วนสถานะของ Product ตามตัวกรองที่เลือก
-          </p>
-        </div>
-        <div className="rounded-md border bg-secondary/40 px-3 py-2 text-right">
-          <div className="flex items-center justify-end gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            <Truck className="h-3.5 w-3.5" /> STATUS
-          </div>
-          <div className="text-xl font-semibold tabular-nums">
-            {delivered.toLocaleString()}
-            <span className="ml-1 text-xs font-normal text-muted-foreground">
-              ({deliveredPct.toFixed(1)}%)
-            </span>
-          </div>
-        </div>
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold">Status of product</h2>
+        <p className="text-xs text-muted-foreground">
+          สัดส่วนสถานะของ Product ตามตัวกรองที่เลือก
+        </p>
       </div>
       {data.length === 0 ? (
         <EmptyState />
@@ -662,22 +663,9 @@ function FeedbackChart({ rows }: { rows: NpiRow[] }) {
       {data.length === 0 ? (
         <EmptyState />
       ) : (
-        <div className="w-full" style={{ height: Math.max(260, data.length * 36) }}>
+        <div className="h-[400px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={data}
-              layout="vertical"
-              margin={{ top: 10, right: 24, left: 10, bottom: 10 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
-              <XAxis type="number" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" allowDecimals={false} />
-              <YAxis
-                type="category"
-                dataKey="name"
-                width={180}
-                tick={{ fontSize: 12 }}
-                stroke="var(--muted-foreground)"
-              />
+            <PieChart>
               <Tooltip
                 contentStyle={{
                   background: "var(--popover)",
@@ -685,10 +673,27 @@ function FeedbackChart({ rows }: { rows: NpiRow[] }) {
                   borderRadius: 8,
                   fontFamily: "Kanit",
                 }}
-                formatter={(value: number) => [`${value.toLocaleString()} รายการ`, "Count"]}
+                formatter={(value: number, name: string) => [`${value.toLocaleString()} รายการ`, name]}
               />
-              <Bar dataKey="value" name="Records" fill="var(--chart-2)" radius={[0, 4, 4, 0]} />
-            </BarChart>
+              <Legend />
+              <Pie
+                data={data}
+                cx="50%"
+                cy="50%"
+                outerRadius={120}
+                dataKey="value"
+                nameKey="name"
+                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                labelLine
+              >
+                {data.map((_, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={`var(--chart-${(index % 5) + 1})`}
+                  />
+                ))}
+              </Pie>
+            </PieChart>
           </ResponsiveContainer>
         </div>
       )}
