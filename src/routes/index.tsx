@@ -663,22 +663,9 @@ function FeedbackChart({ rows }: { rows: NpiRow[] }) {
       {data.length === 0 ? (
         <EmptyState />
       ) : (
-        <div className="w-full" style={{ height: Math.max(260, data.length * 36) }}>
+        <div className="h-[400px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={data}
-              layout="vertical"
-              margin={{ top: 10, right: 24, left: 10, bottom: 10 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
-              <XAxis type="number" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" allowDecimals={false} />
-              <YAxis
-                type="category"
-                dataKey="name"
-                width={180}
-                tick={{ fontSize: 12 }}
-                stroke="var(--muted-foreground)"
-              />
+            <PieChart>
               <Tooltip
                 contentStyle={{
                   background: "var(--popover)",
@@ -686,10 +673,27 @@ function FeedbackChart({ rows }: { rows: NpiRow[] }) {
                   borderRadius: 8,
                   fontFamily: "Kanit",
                 }}
-                formatter={(value: number) => [`${value.toLocaleString()} รายการ`, "Count"]}
+                formatter={(value: number, name: string) => [`${value.toLocaleString()} รายการ`, name]}
               />
-              <Bar dataKey="value" name="Records" fill="var(--chart-2)" radius={[0, 4, 4, 0]} />
-            </BarChart>
+              <Legend />
+              <Pie
+                data={data}
+                cx="50%"
+                cy="50%"
+                outerRadius={120}
+                dataKey="value"
+                nameKey="name"
+                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                labelLine
+              >
+                {data.map((_, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={`var(--chart-${(index % 5) + 1})`}
+                  />
+                ))}
+              </Pie>
+            </PieChart>
           </ResponsiveContainer>
         </div>
       )}
