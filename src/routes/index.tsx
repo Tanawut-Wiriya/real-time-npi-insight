@@ -200,11 +200,12 @@ function Dashboard() {
               options={years.map(String)}
             />
             <FilterSelect
-              label="Country"
-              value={country}
-              onChange={setCountry}
-              options={countries.map(String)}
+              label="Month"
+              value={month}
+              onChange={setMonth}
+              options={months.map(String)}
             />
+
             <FilterSelect
               label="Status"
               value={status}
