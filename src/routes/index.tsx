@@ -154,10 +154,11 @@ function Dashboard() {
 
   const reset = () => {
     setYear(ALL);
-    setCountry(ALL);
+    setMonth(ALL);
     setStatus(ALL);
     setProduct(ALL);
   };
+
 
   return (
     <div className="min-h-screen bg-background">
