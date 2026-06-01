@@ -578,7 +578,7 @@ function EmptyState() {
   );
 }
 
-function StatusPieChart({ rows, delivered }: { rows: NpiRow[]; delivered: number }) {
+function StatusPieChart({ rows }: { rows: NpiRow[] }) {
   const data = useMemo(() => {
     const map = new Map<string, number>();
     for (const r of rows) {
@@ -590,31 +590,15 @@ function StatusPieChart({ rows, delivered }: { rows: NpiRow[]; delivered: number
       .sort((a, b) => b.value - a.value);
   }, [rows]);
 
-  const total = data.reduce((s, d) => s + d.value, 0);
-  const deliveredPct = total > 0 ? (delivered / total) * 100 : 0;
-
   const COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
 
   return (
     <Card className="p-5">
-      <div className="mb-4 flex items-start justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-semibold">Status of product</h2>
-          <p className="text-xs text-muted-foreground">
-            สัดส่วนสถานะของ Product ตามตัวกรองที่เลือก
-          </p>
-        </div>
-        <div className="rounded-md border bg-secondary/40 px-3 py-2 text-right">
-          <div className="flex items-center justify-end gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            <Truck className="h-3.5 w-3.5" /> STATUS
-          </div>
-          <div className="text-xl font-semibold tabular-nums">
-            {delivered.toLocaleString()}
-            <span className="ml-1 text-xs font-normal text-muted-foreground">
-              ({deliveredPct.toFixed(1)}%)
-            </span>
-          </div>
-        </div>
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold">Status of product</h2>
+        <p className="text-xs text-muted-foreground">
+          สัดส่วนสถานะของ Product ตามตัวกรองที่เลือก
+        </p>
       </div>
       {data.length === 0 ? (
         <EmptyState />
