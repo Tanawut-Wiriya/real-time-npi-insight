@@ -228,7 +228,7 @@ function Dashboard() {
         </Card>
 
         {/* KPIs */}
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <KpiCard
             label="Total Projects"
             value={filtered.length.toLocaleString()}
@@ -447,8 +447,6 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
     { key: "Quantity", label: "QTY." },
     { key: "Status", label: "START DATE" },
     { key: "Delivery", label: "STATUS" },
-    { key: "EstimateShipment", label: "Estimate Shipment" },
-    { key: "Shipment", label: "Shipment" },
     { key: "CustomerFeedback", label: "Customer Feedback" },
   ];
 
@@ -515,11 +513,6 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
                     </TableCell>
                     <TableCell>
                       <DeliveryBadge value={r.Delivery} />
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap">{r.EstimateShipment}</TableCell>
-                    <TableCell className="whitespace-nowrap">{r.Shipment}</TableCell>
-                    <TableCell className="max-w-[240px] truncate" title={r.CustomerFeedback}>
-                      {r.CustomerFeedback || "-"}
                     </TableCell>
                   </TableRow>
                 ))}
