@@ -15,6 +15,8 @@ export interface NpiRow {
   Status: string;
   Delivery: string;
   CustomerFeedback: string;
+  EstimateShipment: string;
+  Shipment: string;
 }
 
 // Bangkok timezone (GMT+7) — Google Apps Script serializes dates to UTC,
