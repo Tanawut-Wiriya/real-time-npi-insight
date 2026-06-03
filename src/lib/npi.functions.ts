@@ -55,8 +55,21 @@ function clean(s: unknown): string {
 
 export const getNpiData = createServerFn({ method: "GET" }).handler(
   async (): Promise<NpiRow[]> => {
-    const res = await fetch(DATA_URL, { redirect: "follow" });
-    if (!res.ok) throw new Error(`Failed to fetch data: ${res.status}`);
+    // Google Apps Script web apps respond with 302 to a googleusercontent.com
+    // URL. Follow redirects manually so the call works on Cloudflare workerd.
+    let url = DATA_URL;
+    let res: Response | null = null;
+    for (let i = 0; i < 5; i++) {
+      res = await fetch(url, { redirect: "manual" });
+      if (res.status >= 300 && res.status < 400) {
+        const loc = res.headers.get("location");
+        if (!loc) break;
+        url = loc;
+        continue;
+      }
+      break;
+    }
+    if (!res || !res.ok) throw new Error(`Failed to fetch data: ${res?.status}`);
     const raw = (await res.json()) as Array<Record<string, unknown>>;
     return raw.map((r) => ({
       No: Number(r.No) || 0,
@@ -70,6 +83,8 @@ export const getNpiData = createServerFn({ method: "GET" }).handler(
       Status: clean(r.Status),
       Delivery: clean(r.Delivery),
       CustomerFeedback: String(r["Customer feedback"] ?? r.CustomerFeedback ?? "").trim(),
+      EstimateShipment: clean(r["Estimate Shipment"] ?? r.EstimateShipment),
+      Shipment: clean(r.Shipment),
     }));
   },
 );
