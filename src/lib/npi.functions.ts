@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
 const DATA_URL =
-  "https://script.google.com/macros/s/AKfycbwPSu_uio1JWCVoz2fa-d6jdj-sfDqa1vl02dQuYiGjthEcEXm3lZt1vaVNx3BdVWyppg/exec";
+  "https://script.google.com/macros/s/AKfycbwuQCRSkSzCm1JwixbYbJOQNAWRudA1CgI_vQGeA20VdoOFAwXnesyaoui6zG88n7P5gA/exec";
 
 export interface NpiRow {
   No: number;
