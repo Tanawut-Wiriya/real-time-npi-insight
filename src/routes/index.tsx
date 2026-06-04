@@ -102,7 +102,18 @@ function Dashboard() {
       ),
     [rows],
   );
-  const statuses = useMemo(() => uniq(rows.map((r) => r.Status)), [rows]);
+  const STATUS_ORDER = ["Inproduction", "Inprogress", "Ready for shipment", "Partial Delivered", "Delivered"];
+  const statuses = useMemo(() => {
+    const all = Array.from(new Set(rows.map((r) => r.Status).filter((s) => s !== "" && s != null)));
+    return all.sort((a, b) => {
+      const ai = STATUS_ORDER.indexOf(a);
+      const bi = STATUS_ORDER.indexOf(b);
+      if (ai !== -1 && bi !== -1) return ai - bi;
+      if (ai !== -1) return -1;
+      if (bi !== -1) return 1;
+      return String(a).localeCompare(String(b));
+    });
+  }, [rows]);
   const products = useMemo(() => uniq(rows.map((r) => r.Product)), [rows]);
 
   // Default to the latest year on first load
@@ -441,12 +452,12 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
   const cols: { key: SortKey; label: string; className?: string }[] = [
     { key: "No", label: "No", className: "w-14" },
     { key: "Product", label: "Product" },
-    { key: "Country", label: "Country" },
     { key: "Article", label: "Article" },
     { key: "Description", label: "Description" },
     { key: "Quantity", label: "QTY." },
-    { key: "Status", label: "START DATE" },
-    { key: "Delivery", label: "STATUS" },
+    { key: "YearMonth", label: "START DATE" },
+    { key: "Status", label: "STATUS" },
+    { key: "Delivery", label: "Delivery" },
     { key: "EstimateShipment", label: "Estimate Shipment" },
     { key: "Shipment", label: "Shipment" },
     { key: "CustomerFeedback", label: "Customer Feedback" },
