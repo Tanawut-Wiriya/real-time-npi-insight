@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
 const DATA_URL =
-  "https://script.google.com/macros/s/AKfycbwPSu_uio1JWCVoz2fa-d6jdj-sfDqa1vl02dQuYiGjthEcEXm3lZt1vaVNx3BdVWyppg/exec";
+  "https://script.google.com/macros/s/AKfycbwuQCRSkSzCm1JwixbYbJOQNAWRudA1CgI_vQGeA20VdoOFAwXnesyaoui6zG88n7P5gA/exec";
 
 export interface NpiRow {
   No: number;
@@ -15,6 +15,8 @@ export interface NpiRow {
   Status: string;
   Delivery: string;
   CustomerFeedback: string;
+  EstimateShipment: string;
+  Shipment: string;
 }
 
 // Bangkok timezone (GMT+7) — Google Apps Script serializes dates to UTC,
@@ -46,6 +48,27 @@ function normalizeYearMonth(v: unknown): string {
   return String(v);
 }
 
+function formatDate(v: unknown): string {
+  if (v == null || v === "") return "-";
+  if (typeof v === "number") {
+    const ms = (v - 25569) * 86400 * 1000;
+    const d = new Date(ms);
+    if (!isNaN(d.getTime())) {
+      const shifted = new Date(d.getTime() + TZ_OFFSET_MS);
+      return `${shifted.getUTCFullYear()}-${String(shifted.getUTCMonth() + 1).padStart(2, "0")}-${String(shifted.getUTCDate()).padStart(2, "0")}`;
+    }
+  }
+  if (typeof v === "string") {
+    const d = new Date(v);
+    if (!isNaN(d.getTime())) {
+      const shifted = new Date(d.getTime() + TZ_OFFSET_MS);
+      return `${shifted.getUTCFullYear()}-${String(shifted.getUTCMonth() + 1).padStart(2, "0")}-${String(shifted.getUTCDate()).padStart(2, "0")}`;
+    }
+    return v;
+  }
+  return String(v);
+}
+
 function clean(s: unknown): string {
   if (s == null) return "";
   return String(s).replace(/^[:\s-]+/, "").trim() || "-";
@@ -68,6 +91,8 @@ export const getNpiData = createServerFn({ method: "GET" }).handler(
       Status: clean(r.Status),
       Delivery: clean(r.Delivery),
       CustomerFeedback: String(r["Customer feedback"] ?? r.CustomerFeedback ?? "").trim(),
+      EstimateShipment: formatDate(r["Estimate Shipment"] ?? r.EstimateShipment),
+      Shipment: formatDate(r["Shipment"] ?? r.Shipment),
     }));
   },
 );

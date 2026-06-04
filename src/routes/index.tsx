@@ -447,6 +447,8 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
     { key: "Quantity", label: "QTY." },
     { key: "Status", label: "START DATE" },
     { key: "Delivery", label: "STATUS" },
+    { key: "EstimateShipment", label: "Estimate Shipment" },
+    { key: "Shipment", label: "Shipment" },
     { key: "CustomerFeedback", label: "Customer Feedback" },
   ];
 
@@ -513,6 +515,11 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
                     </TableCell>
                     <TableCell>
                       <DeliveryBadge value={r.Delivery} />
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap text-xs">{r.EstimateShipment}</TableCell>
+                    <TableCell className="whitespace-nowrap text-xs">{r.Shipment}</TableCell>
+                    <TableCell className="max-w-[240px] truncate text-xs" title={r.CustomerFeedback}>
+                      {r.CustomerFeedback || "-"}
                     </TableCell>
                   </TableRow>
                 ))}
