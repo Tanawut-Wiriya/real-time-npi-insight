@@ -512,7 +512,6 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
                       {r.No}
                     </TableCell>
                     <TableCell className="font-medium">{r.Product}</TableCell>
-                    <TableCell>{r.Country}</TableCell>
                     <TableCell className="font-mono text-xs">{r.Article}</TableCell>
                     <TableCell className="max-w-[280px] truncate" title={r.Description}>
                       {r.Description}
