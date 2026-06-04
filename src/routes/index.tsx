@@ -516,6 +516,11 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
                     <TableCell>
                       <DeliveryBadge value={r.Delivery} />
                     </TableCell>
+                    <TableCell className="whitespace-nowrap text-xs">{r.EstimateShipment}</TableCell>
+                    <TableCell className="whitespace-nowrap text-xs">{r.Shipment}</TableCell>
+                    <TableCell className="max-w-[240px] truncate text-xs" title={r.CustomerFeedback}>
+                      {r.CustomerFeedback || "-"}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
