@@ -607,7 +607,14 @@ function StatusPieChart({ rows }: { rows: NpiRow[] }) {
       .sort((a, b) => b.value - a.value);
   }, [rows]);
 
-  const COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
+  const getStatusColor = (name: string) => {
+    const v = name.toLowerCase().replace(/\s/g, "");
+    if (v === "delivered") return "#22c55e";
+    if (v === "inprogress") return "#94a3b8";
+    if (v === "inproduction") return "#facc15";
+    if (v === "partialdelivered") return "#86efac";
+    return "var(--chart-1)";
+  };
 
   return (
     <Card className="p-5">
@@ -643,8 +650,8 @@ function StatusPieChart({ rows }: { rows: NpiRow[] }) {
                 label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                 labelLine
               >
-                {data.map((_, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={getStatusColor(entry.name)} />
                 ))}
               </Pie>
             </PieChart>
