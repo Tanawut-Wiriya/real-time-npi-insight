@@ -102,18 +102,7 @@ function Dashboard() {
       ),
     [rows],
   );
-  const STATUS_ORDER = ["Inproduction", "Inprogress", "Ready for shipment", "Partial Delivered", "Delivered"];
-  const statuses = useMemo(() => {
-    const all = Array.from(new Set(rows.map((r) => r.Status).filter((s) => s !== "" && s != null)));
-    return all.sort((a, b) => {
-      const ai = STATUS_ORDER.indexOf(a);
-      const bi = STATUS_ORDER.indexOf(b);
-      if (ai !== -1 && bi !== -1) return ai - bi;
-      if (ai !== -1) return -1;
-      if (bi !== -1) return 1;
-      return String(a).localeCompare(String(b));
-    });
-  }, [rows]);
+  const statuses = useMemo(() => uniq(rows.map((r) => r.Status)), [rows]);
   const products = useMemo(() => uniq(rows.map((r) => r.Product)), [rows]);
 
   // Default to the latest year on first load
