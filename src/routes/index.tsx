@@ -28,7 +28,7 @@ import {
   RefreshCw,
   Truck,
 } from "lucide-react";
-import { getNpiData, type NpiRow } from "@/lib/npi.functions";
+import { getNpiData, getAsmlData, type NpiRow, type AsmlRow } from "@/lib/npi.functions";
 import {
   Select,
   SelectContent,
