@@ -96,3 +96,46 @@ export const getNpiData = createServerFn({ method: "GET" }).handler(
     }));
   },
 );
+
+export interface AsmlRow {
+  No: number;
+  Product: string;
+  Description: string;
+  Article: string | number;
+  Status: string;
+  Plan: string; // normalized "YYYY-MM-DD"
+  PlanYearMonth: string; // "YYYY-MM"
+  PlanYear: number;
+  Quantity: number;
+  Remark: string;
+}
+
+function planYM(dateStr: string): string {
+  const m = dateStr.match(/^(\d{4})-(\d{2})/);
+  return m ? `${m[1]}-${m[2]}` : "";
+}
+
+export const getAsmlData = createServerFn({ method: "GET" }).handler(
+  async (): Promise<AsmlRow[]> => {
+    const url = `${DATA_URL}?sheet=${encodeURIComponent("ASML Raw Data")}`;
+    const res = await fetch(url, { redirect: "follow" });
+    if (!res.ok) throw new Error(`Failed to fetch data: ${res.status}`);
+    const raw = (await res.json()) as Array<Record<string, unknown>>;
+    return raw.map((r) => {
+      const plan = formatDate(r.Plan);
+      const ym = planYM(plan);
+      return {
+        No: Number(r.No) || 0,
+        Product: String(r.Product ?? ""),
+        Description: String(r.Description ?? ""),
+        Article: (r.Article as string | number) ?? "",
+        Status: clean(r.Status),
+        Plan: plan,
+        PlanYearMonth: ym,
+        PlanYear: ym ? Number(ym.slice(0, 4)) : 0,
+        Quantity: Number(r.Quantity) || 0,
+        Remark: String(r.Remark ?? "").trim(),
+      };
+    });
+  },
+);
