@@ -28,7 +28,7 @@ import {
   RefreshCw,
   Truck,
 } from "lucide-react";
-import { getNpiData, type NpiRow } from "@/lib/npi.functions";
+import { getNpiData, getAsmlData, type NpiRow, type AsmlRow } from "@/lib/npi.functions";
 import {
   Select,
   SelectContent,
@@ -54,6 +54,12 @@ const npiQuery = queryOptions({
   staleTime: 60_000,
 });
 
+const asmlQuery = queryOptions({
+  queryKey: ["asml-data"],
+  queryFn: () => getAsmlData(),
+  staleTime: 60_000,
+});
+
 export const Route = createFileRoute("/")({
   component: DashboardPage,
 });
@@ -61,7 +67,36 @@ export const Route = createFileRoute("/")({
 const ALL = "__all__";
 
 function DashboardPage() {
-  return <Dashboard />;
+  const [view, setView] = useState<"npi" | "asml">("npi");
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="mx-auto flex max-w-[1400px] justify-end px-6 pt-4">
+        <div className="inline-flex rounded-md border p-0.5">
+          <button
+            onClick={() => setView("npi")}
+            className={`rounded px-3 py-1 text-xs font-medium transition ${
+              view === "npi"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            NPI Dashboard
+          </button>
+          <button
+            onClick={() => setView("asml")}
+            className={`rounded px-3 py-1 text-xs font-medium transition ${
+              view === "asml"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            ASML Dashboard
+          </button>
+        </div>
+      </div>
+      {view === "npi" ? <Dashboard /> : <AsmlDashboard />}
+    </div>
+  );
 }
 
 function Dashboard() {
@@ -745,5 +780,269 @@ function DashboardSkeleton() {
         <div className="h-[400px] animate-pulse rounded-lg bg-muted" />
       </main>
     </div>
+  );
+}
+
+function AsmlDashboard() {
+  const { data, isFetching, isLoading, refetch, error } = useQuery(asmlQuery);
+  const rows: AsmlRow[] = data ?? [];
+
+  const [year, setYear] = useState<string>(ALL);
+  const [product, setProduct] = useState<string>(ALL);
+  const [plan, setPlan] = useState<string>(ALL);
+  const [chartType, setChartType] = useState<"bar" | "line">("bar");
+
+  const uniq = (arr: (string | number)[]) =>
+    Array.from(new Set(arr.filter((v) => v !== "" && v != null))).sort((a, b) =>
+      String(a).localeCompare(String(b)),
+    );
+
+  const years = useMemo(() => uniq(rows.map((r) => r.PlanYear).filter((y) => y > 0)), [rows]);
+  const products = useMemo(() => uniq(rows.map((r) => r.Product)), [rows]);
+  const plans = useMemo(() => uniq(rows.map((r) => r.PlanYearMonth).filter((p) => !!p)), [rows]);
+
+  const filtered = useMemo(
+    () =>
+      rows.filter(
+        (r) =>
+          (year === ALL || String(r.PlanYear) === year) &&
+          (product === ALL || r.Product === product) &&
+          (plan === ALL || r.PlanYearMonth === plan),
+      ),
+    [rows, year, product, plan],
+  );
+
+  const chartData = useMemo(() => {
+    const map = new Map<string, { YearMonth: string; Count: number; Quantity: number }>();
+    for (const r of filtered) {
+      const k = r.PlanYearMonth || "Unknown";
+      const cur = map.get(k) ?? { YearMonth: k, Count: 0, Quantity: 0 };
+      cur.Count += 1;
+      cur.Quantity += r.Quantity;
+      map.set(k, cur);
+    }
+    return Array.from(map.values()).sort((a, b) => a.YearMonth.localeCompare(b.YearMonth));
+  }, [filtered]);
+
+  const totalQty = filtered.reduce((s, r) => s + r.Quantity, 0);
+
+  const reset = () => {
+    setYear(ALL);
+    setProduct(ALL);
+    setPlan(ALL);
+  };
+
+  if (isLoading) return <DashboardSkeleton />;
+  if (error)
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center p-6 text-center">
+        <div>
+          <h2 className="text-xl font-semibold">โหลดข้อมูลไม่สำเร็จ</h2>
+          <p className="mt-2 text-sm text-muted-foreground">{(error as Error).message}</p>
+          <Button onClick={() => refetch()} className="mt-4">
+            <RefreshCw className="mr-2 h-4 w-4" /> ลองอีกครั้ง
+          </Button>
+        </div>
+      </div>
+    );
+
+  return (
+    <>
+      <header className="border-b bg-card/50 backdrop-blur">
+        <div className="mx-auto flex max-w-[1400px] flex-col gap-1 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">ASML Analytics</h1>
+            <p className="text-sm text-muted-foreground">
+              Real-time dashboard for ASML production plan
+            </p>
+          </div>
+          <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching}>
+            {isFetching ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="mr-2 h-4 w-4" />
+            )}
+            Refresh Data
+          </Button>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-[1400px] space-y-6 px-6 py-6">
+        <Card className="p-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <FilterSelect label="Year" value={year} onChange={setYear} options={years.map(String)} />
+            <FilterSelect label="Product" value={product} onChange={setProduct} options={products.map(String)} />
+            <FilterSelect label="Plan" value={plan} onChange={setPlan} options={plans.map(String)} />
+            <div className="flex items-end">
+              <Button variant="outline" onClick={reset} className="w-full">
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Reset Filters
+              </Button>
+            </div>
+          </div>
+        </Card>
+
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+          <KpiCard label="Total Records" value={filtered.length.toLocaleString()} icon={<Package className="h-4 w-4" />} />
+          <KpiCard label="Total Quantity" value={totalQty.toLocaleString()} icon={<BarChart3 className="h-4 w-4" />} />
+          <KpiCard label="Products" value={uniq(filtered.map((r) => r.Product)).length.toLocaleString()} icon={<LineIcon className="h-4 w-4" />} />
+        </div>
+
+        <Card className="p-5">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold">Quantity by Plan Month</h2>
+              <p className="text-xs text-muted-foreground">
+                จำนวน Product และ Quantity แยกตาม YearMonth ตามตัวกรองที่เลือก
+              </p>
+            </div>
+            <div className="flex gap-1 rounded-md border p-0.5">
+              <button
+                onClick={() => setChartType("bar")}
+                className={`rounded px-3 py-1 text-xs font-medium transition ${
+                  chartType === "bar"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Bar
+              </button>
+              <button
+                onClick={() => setChartType("line")}
+                className={`rounded px-3 py-1 text-xs font-medium transition ${
+                  chartType === "line"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Line
+              </button>
+            </div>
+          </div>
+          {chartData.length === 0 ? (
+            <EmptyState />
+          ) : (
+            <div className="h-[360px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                {chartType === "bar" ? (
+                  <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                    <XAxis dataKey="YearMonth" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
+                    <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
+                    <Tooltip
+                      contentStyle={{
+                        background: "var(--popover)",
+                        border: "1px solid var(--border)",
+                        borderRadius: 8,
+                        fontFamily: "Kanit",
+                      }}
+                    />
+                    <Legend />
+                    <Bar dataKey="Quantity" name="Quantity" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="Count" name="Products" fill="var(--chart-2)" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                ) : (
+                  <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                    <XAxis dataKey="YearMonth" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
+                    <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
+                    <Tooltip
+                      contentStyle={{
+                        background: "var(--popover)",
+                        border: "1px solid var(--border)",
+                        borderRadius: 8,
+                        fontFamily: "Kanit",
+                      }}
+                    />
+                    <Legend />
+                    <Line type="monotone" dataKey="Quantity" name="Quantity" stroke="var(--chart-1)" strokeWidth={2} dot={{ r: 3 }} />
+                    <Line type="monotone" dataKey="Count" name="Products" stroke="var(--chart-2)" strokeWidth={2} dot={{ r: 3 }} />
+                  </LineChart>
+                )}
+              </ResponsiveContainer>
+            </div>
+          )}
+        </Card>
+
+        <AsmlTable rows={filtered} />
+      </main>
+    </>
+  );
+}
+
+function AsmlTable({ rows }: { rows: AsmlRow[] }) {
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+  const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const start = (safePage - 1) * pageSize;
+  const pageRows = rows.slice(start, start + pageSize);
+
+  return (
+    <Card className="overflow-hidden p-0">
+      <div className="flex items-center justify-between border-b px-5 py-4">
+        <div>
+          <h2 className="text-lg font-semibold">Filtered Records</h2>
+          <p className="text-xs text-muted-foreground">{rows.length.toLocaleString()} รายการ</p>
+        </div>
+      </div>
+      {rows.length === 0 ? (
+        <div className="p-10">
+          <EmptyState />
+        </div>
+      ) : (
+        <>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/40 hover:bg-muted/40">
+                  {["No", "Product", "Description", "Article", "Status", "Plan", "QTY.", "Remark"].map((h) => (
+                    <TableHead key={h} className="whitespace-nowrap text-xs font-semibold uppercase tracking-wide">
+                      {h}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {pageRows.map((r) => (
+                  <TableRow key={r.No} className="text-sm">
+                    <TableCell className="font-mono text-xs text-muted-foreground">{r.No}</TableCell>
+                    <TableCell className="font-medium">{r.Product}</TableCell>
+                    <TableCell className="max-w-[280px] truncate" title={r.Description}>
+                      {r.Description}
+                    </TableCell>
+                    <TableCell className="font-mono text-xs">{r.Article}</TableCell>
+                    <TableCell>
+                      <StatusBadge value={r.Status} />
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap text-xs">{r.Plan || "-"}</TableCell>
+                    <TableCell className="text-right tabular-nums">{r.Quantity.toLocaleString()}</TableCell>
+                    <TableCell className="max-w-[240px] truncate text-xs" title={r.Remark}>
+                      {r.Remark || "-"}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="flex items-center justify-between border-t px-5 py-3">
+            <span className="text-xs text-muted-foreground">
+              แสดง {start + 1}–{Math.min(start + pageSize, rows.length)} จาก {rows.length.toLocaleString()}
+            </span>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={safePage <= 1}>
+                ก่อนหน้า
+              </Button>
+              <span className="text-xs text-muted-foreground">
+                หน้า {safePage} / {totalPages}
+              </span>
+              <Button variant="outline" size="sm" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={safePage >= totalPages}>
+                ถัดไป
+              </Button>
+            </div>
+          </div>
+        </>
+      )}
+    </Card>
   );
 }
