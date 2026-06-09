@@ -54,6 +54,12 @@ const npiQuery = queryOptions({
   staleTime: 60_000,
 });
 
+const asmlQuery = queryOptions({
+  queryKey: ["asml-data"],
+  queryFn: () => getAsmlData(),
+  staleTime: 60_000,
+});
+
 export const Route = createFileRoute("/")({
   component: DashboardPage,
 });
@@ -61,7 +67,36 @@ export const Route = createFileRoute("/")({
 const ALL = "__all__";
 
 function DashboardPage() {
-  return <Dashboard />;
+  const [view, setView] = useState<"npi" | "asml">("npi");
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="mx-auto flex max-w-[1400px] justify-end px-6 pt-4">
+        <div className="inline-flex rounded-md border p-0.5">
+          <button
+            onClick={() => setView("npi")}
+            className={`rounded px-3 py-1 text-xs font-medium transition ${
+              view === "npi"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            NPI Dashboard
+          </button>
+          <button
+            onClick={() => setView("asml")}
+            className={`rounded px-3 py-1 text-xs font-medium transition ${
+              view === "asml"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            ASML Dashboard
+          </button>
+        </div>
+      </div>
+      {view === "npi" ? <Dashboard /> : <AsmlDashboard />}
+    </div>
+  );
 }
 
 function Dashboard() {
