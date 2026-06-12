@@ -128,13 +128,19 @@ function planYM(dateStr: string): string {
 
 export const getAsmlData = createServerFn({ method: "GET" }).handler(
   async (): Promise<AsmlRow[]> => {
-    const url = `${DATA_URL}?sheet=${encodeURIComponent("ASML Raw Data")}`;
-    const res = await fetch(url, { redirect: "follow" });
-    if (!res.ok) throw new Error(`Failed to fetch data: ${res.status}`);
-    const raw = (await res.json()) as Array<Record<string, unknown>>;
+    const { asmlRawData: raw } = await fetchAll();
     return raw.map((r) => {
-      const plan = formatDate(r.Plan);
-      const ym = planYM(plan);
+      const planRaw = r.Plan;
+      // Plan may be a date or a work-week label like "WW21"
+      let plan = "";
+      let ym = "";
+      if (typeof planRaw === "number" || (typeof planRaw === "string" && /\d{4}-\d{2}/.test(planRaw))) {
+        plan = formatDate(planRaw);
+        ym = planYM(plan);
+      } else if (planRaw != null) {
+        plan = String(planRaw).trim();
+        ym = plan; // use raw label (e.g. "WW21") as the grouping key
+      }
       return {
         No: Number(r.No) || 0,
         Product: String(r.Product ?? ""),
@@ -143,7 +149,7 @@ export const getAsmlData = createServerFn({ method: "GET" }).handler(
         Status: clean(r.Status),
         Plan: plan,
         PlanYearMonth: ym,
-        PlanYear: ym ? Number(ym.slice(0, 4)) : 0,
+        PlanYear: ym && /^\d{4}/.test(ym) ? Number(ym.slice(0, 4)) : 0,
         Quantity: Number(r.Quantity) || 0,
         Remark: String(r.Remark ?? "").trim(),
       };
