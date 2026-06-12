@@ -74,11 +74,22 @@ function clean(s: unknown): string {
   return String(s).replace(/^[:\s-]+/, "").trim() || "-";
 }
 
+async function fetchAll(): Promise<{ rawData: Array<Record<string, unknown>>; asmlRawData: Array<Record<string, unknown>> }> {
+  const res = await fetch(DATA_URL, { redirect: "follow" });
+  if (!res.ok) throw new Error(`Failed to fetch data: ${res.status}`);
+  const json = (await res.json()) as unknown;
+  if (Array.isArray(json)) {
+    return { rawData: json as Array<Record<string, unknown>>, asmlRawData: [] };
+  }
+  const obj = (json ?? {}) as Record<string, unknown>;
+  const rawData = Array.isArray(obj.rawData) ? (obj.rawData as Array<Record<string, unknown>>) : [];
+  const asmlRawData = Array.isArray(obj.asmlRawData) ? (obj.asmlRawData as Array<Record<string, unknown>>) : [];
+  return { rawData, asmlRawData };
+}
+
 export const getNpiData = createServerFn({ method: "GET" }).handler(
   async (): Promise<NpiRow[]> => {
-    const res = await fetch(DATA_URL, { redirect: "follow" });
-    if (!res.ok) throw new Error(`Failed to fetch data: ${res.status}`);
-    const raw = (await res.json()) as Array<Record<string, unknown>>;
+    const { rawData: raw } = await fetchAll();
     return raw.map((r) => ({
       No: Number(r.No) || 0,
       Product: String(r.Product ?? ""),
