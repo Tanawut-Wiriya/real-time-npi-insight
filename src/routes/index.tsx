@@ -103,20 +103,6 @@ function Dashboard() {
   const { data, isFetching, isLoading, refetch, error } = useQuery(npiQuery);
   const rows: NpiRow[] = data ?? [];
 
-  if (isLoading) return <DashboardSkeleton />;
-  if (error)
-    return (
-      <div className="flex min-h-screen items-center justify-center p-6 text-center">
-        <div>
-          <h2 className="text-xl font-semibold">โหลดข้อมูลไม่สำเร็จ</h2>
-          <p className="mt-2 text-sm text-muted-foreground">{(error as Error).message}</p>
-          <Button onClick={() => refetch()} className="mt-4">
-            <RefreshCw className="mr-2 h-4 w-4" /> ลองอีกครั้ง
-          </Button>
-        </div>
-      </div>
-    );
-
   const [year, setYear] = useState<string>(ALL);
   const [month, setMonth] = useState<string>(ALL);
   const [status, setStatus] = useState<string>(ALL);
@@ -151,6 +137,20 @@ function Dashboard() {
     if (latest != null) setYear(String(latest));
     setYearInitialized(true);
   }, [years, yearInitialized]);
+
+  if (isLoading) return <DashboardSkeleton />;
+  if (error)
+    return (
+      <div className="flex min-h-screen items-center justify-center p-6 text-center">
+        <div>
+          <h2 className="text-xl font-semibold">โหลดข้อมูลไม่สำเร็จ</h2>
+          <p className="mt-2 text-sm text-muted-foreground">{(error as Error).message}</p>
+          <Button onClick={() => refetch()} className="mt-4">
+            <RefreshCw className="mr-2 h-4 w-4" /> ลองอีกครั้ง
+          </Button>
+        </div>
+      </div>
+    );
 
   const filtered = useMemo(
     () =>
