@@ -1026,7 +1026,7 @@ function AsmlStatusPieChart({ rows }: { rows: AsmlRow[] }) {
                 outerRadius={70}
                 dataKey="value"
                 nameKey="name"
-                label={({ name, percent, value }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
+                label={({ percent, value }) => `${value} (${(percent * 100).toFixed(0)}%)`}
                 labelLine
               >
                 {data.map((entry, index) => (
