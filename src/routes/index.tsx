@@ -103,20 +103,6 @@ function Dashboard() {
   const { data, isFetching, isLoading, refetch, error } = useQuery(npiQuery);
   const rows: NpiRow[] = data ?? [];
 
-  if (isLoading) return <DashboardSkeleton />;
-  if (error)
-    return (
-      <div className="flex min-h-screen items-center justify-center p-6 text-center">
-        <div>
-          <h2 className="text-xl font-semibold">โหลดข้อมูลไม่สำเร็จ</h2>
-          <p className="mt-2 text-sm text-muted-foreground">{(error as Error).message}</p>
-          <Button onClick={() => refetch()} className="mt-4">
-            <RefreshCw className="mr-2 h-4 w-4" /> ลองอีกครั้ง
-          </Button>
-        </div>
-      </div>
-    );
-
   const [year, setYear] = useState<string>(ALL);
   const [month, setMonth] = useState<string>(ALL);
   const [status, setStatus] = useState<string>(ALL);
@@ -151,6 +137,20 @@ function Dashboard() {
     if (latest != null) setYear(String(latest));
     setYearInitialized(true);
   }, [years, yearInitialized]);
+
+  if (isLoading) return <DashboardSkeleton />;
+  if (error)
+    return (
+      <div className="flex min-h-screen items-center justify-center p-6 text-center">
+        <div>
+          <h2 className="text-xl font-semibold">โหลดข้อมูลไม่สำเร็จ</h2>
+          <p className="mt-2 text-sm text-muted-foreground">{(error as Error).message}</p>
+          <Button onClick={() => refetch()} className="mt-4">
+            <RefreshCw className="mr-2 h-4 w-4" /> ลองอีกครั้ง
+          </Button>
+        </div>
+      </div>
+    );
 
   const filtered = useMemo(
     () =>
@@ -888,85 +888,156 @@ function AsmlDashboard() {
           <KpiCard label="Products" value={uniq(filtered.map((r) => r.Product)).length.toLocaleString()} icon={<LineIcon className="h-4 w-4" />} />
         </div>
 
-        <Card className="p-5">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold">Quantity by Plan Month</h2>
-              <p className="text-xs text-muted-foreground">
-                จำนวน Product และ Quantity แยกตาม YearMonth ตามตัวกรองที่เลือก
-              </p>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <Card className="p-5 lg:col-span-2">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold">Quantity by Plan Month</h2>
+                <p className="text-xs text-muted-foreground">
+                  จำนวน Product และ Quantity แยกตาม YearMonth ตามตัวกรองที่เลือก
+                </p>
+              </div>
+              <div className="flex gap-1 rounded-md border p-0.5">
+                <button
+                  onClick={() => setChartType("bar")}
+                  className={`rounded px-3 py-1 text-xs font-medium transition ${
+                    chartType === "bar"
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Bar
+                </button>
+                <button
+                  onClick={() => setChartType("line")}
+                  className={`rounded px-3 py-1 text-xs font-medium transition ${
+                    chartType === "line"
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Line
+                </button>
+              </div>
             </div>
-            <div className="flex gap-1 rounded-md border p-0.5">
-              <button
-                onClick={() => setChartType("bar")}
-                className={`rounded px-3 py-1 text-xs font-medium transition ${
-                  chartType === "bar"
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Bar
-              </button>
-              <button
-                onClick={() => setChartType("line")}
-                className={`rounded px-3 py-1 text-xs font-medium transition ${
-                  chartType === "line"
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Line
-              </button>
-            </div>
-          </div>
-          {chartData.length === 0 ? (
-            <EmptyState />
-          ) : (
-            <div className="h-[360px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                {chartType === "bar" ? (
-                  <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                    <XAxis dataKey="YearMonth" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
-                    <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
-                    <Tooltip
-                      contentStyle={{
-                        background: "var(--popover)",
-                        border: "1px solid var(--border)",
-                        borderRadius: 8,
-                        fontFamily: "Kanit",
-                      }}
-                    />
-                    <Legend />
-                    <Bar dataKey="Quantity" name="Quantity" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="Count" name="Products" fill="var(--chart-2)" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                ) : (
-                  <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                    <XAxis dataKey="YearMonth" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
-                    <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
-                    <Tooltip
-                      contentStyle={{
-                        background: "var(--popover)",
-                        border: "1px solid var(--border)",
-                        borderRadius: 8,
-                        fontFamily: "Kanit",
-                      }}
-                    />
-                    <Legend />
-                    <Line type="monotone" dataKey="Quantity" name="Quantity" stroke="var(--chart-1)" strokeWidth={2} dot={{ r: 3 }} />
-                    <Line type="monotone" dataKey="Count" name="Products" stroke="var(--chart-2)" strokeWidth={2} dot={{ r: 3 }} />
-                  </LineChart>
-                )}
-              </ResponsiveContainer>
-            </div>
-          )}
-        </Card>
+            {chartData.length === 0 ? (
+              <EmptyState />
+            ) : (
+              <div className="h-[360px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  {chartType === "bar" ? (
+                    <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                      <XAxis dataKey="YearMonth" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
+                      <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
+                      <Tooltip
+                        contentStyle={{
+                          background: "var(--popover)",
+                          border: "1px solid var(--border)",
+                          borderRadius: 8,
+                          fontFamily: "Kanit",
+                        }}
+                      />
+                      <Legend />
+                      <Bar dataKey="Quantity" name="Quantity" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="Count" name="Products" fill="var(--chart-2)" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  ) : (
+                    <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                      <XAxis dataKey="YearMonth" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
+                      <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
+                      <Tooltip
+                        contentStyle={{
+                          background: "var(--popover)",
+                          border: "1px solid var(--border)",
+                          borderRadius: 8,
+                          fontFamily: "Kanit",
+                        }}
+                      />
+                      <Legend />
+                      <Line type="monotone" dataKey="Quantity" name="Quantity" stroke="var(--chart-1)" strokeWidth={2} dot={{ r: 3 }} />
+                      <Line type="monotone" dataKey="Count" name="Products" stroke="var(--chart-2)" strokeWidth={2} dot={{ r: 3 }} />
+                    </LineChart>
+                  )}
+                </ResponsiveContainer>
+              </div>
+            )}
+          </Card>
+
+          <AsmlStatusPieChart rows={filtered} />
+        </div>
 
         <AsmlTable rows={filtered} />
       </main>
     </>
+  );
+}
+
+function AsmlStatusPieChart({ rows }: { rows: AsmlRow[] }) {
+  const data = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const r of rows) {
+      const s = r.Status || "Unknown";
+      map.set(s, (map.get(s) || 0) + 1);
+    }
+    return Array.from(map.entries())
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value);
+  }, [rows]);
+
+  const getStatusColor = (name: string, index: number) => {
+    const v = name.toLowerCase().replace(/\s/g, "");
+    if (v === "delivered") return "#22c55e";
+    if (v === "inprogress") return "#94a3b8";
+    if (v === "inproduction") return "#facc15";
+    if (v === "partialdelivered") return "#86efac";
+    return `var(--chart-${(index % 5) + 1})`;
+  };
+
+  return (
+    <Card className="p-5">
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold">Status of projects</h2>
+        <p className="text-xs text-muted-foreground">
+          สัดส่วนสถานะของ Product ตามตัวกรองที่เลือก
+        </p>
+      </div>
+      {data.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <div className="h-[360px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Tooltip
+                contentStyle={{
+                  background: "var(--popover)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 8,
+                  fontFamily: "Kanit",
+                }}
+                formatter={(value: number, name: string) => [`${value.toLocaleString()} รายการ`, name]}
+              />
+              <Legend />
+              <Pie
+                data={data}
+                cx="50%"
+                cy="50%"
+                outerRadius={70}
+                dataKey="value"
+                nameKey="name"
+                label={({ percent, value }) => `${value} (${(percent * 100).toFixed(0)}%)`}
+                labelLine
+              >
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={getStatusColor(entry.name, index)} />
+                ))}
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+    </Card>
   );
 }
 
