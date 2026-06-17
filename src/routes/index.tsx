@@ -892,9 +892,9 @@ function AsmlDashboard() {
           <Card className="p-5 lg:col-span-2">
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold">Quantity by Plan Month</h2>
+                <h2 className="text-lg font-semibold">Products by Plan Month</h2>
                 <p className="text-xs text-muted-foreground">
-                  จำนวน Product และ Quantity แยกตาม YearMonth ตามตัวกรองที่เลือก
+                  จำนวน Product แยกตาม YearMonth ตามตัวกรองที่เลือก
                 </p>
               </div>
               <div className="flex gap-1 rounded-md border p-0.5">
@@ -932,15 +932,14 @@ function AsmlDashboard() {
                       <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
                       <Tooltip
                         contentStyle={{
-                          background: "var(--popover)",
-                          border: "1px solid var(--border)",
-                          borderRadius: 8,
-                          fontFamily: "Kanit",
+                           background: "var(--popover)",
+                           border: "1px solid var(--border)",
+                           borderRadius: 8,
+                           fontFamily: "Kanit",
                         }}
                       />
                       <Legend />
-                      <Bar dataKey="Quantity" name="Quantity" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
-                      <Bar dataKey="Count" name="Products" fill="var(--chart-2)" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="Count" name="Products" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   ) : (
                     <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
@@ -949,15 +948,14 @@ function AsmlDashboard() {
                       <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
                       <Tooltip
                         contentStyle={{
-                          background: "var(--popover)",
-                          border: "1px solid var(--border)",
-                          borderRadius: 8,
-                          fontFamily: "Kanit",
+                           background: "var(--popover)",
+                           border: "1px solid var(--border)",
+                           borderRadius: 8,
+                           fontFamily: "Kanit",
                         }}
                       />
                       <Legend />
-                      <Line type="monotone" dataKey="Quantity" name="Quantity" stroke="var(--chart-1)" strokeWidth={2} dot={{ r: 3 }} />
-                      <Line type="monotone" dataKey="Count" name="Products" stroke="var(--chart-2)" strokeWidth={2} dot={{ r: 3 }} />
+                      <Line type="monotone" dataKey="Count" name="Products" stroke="var(--chart-1)" strokeWidth={2} dot={{ r: 3 }} />
                     </LineChart>
                   )}
                 </ResponsiveContainer>
