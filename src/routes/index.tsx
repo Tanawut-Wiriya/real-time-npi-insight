@@ -368,7 +368,7 @@ function Dashboard() {
           </Card>
 
           {/* Status Pie Chart */}
-          <StatusPieChart rows={filtered} />
+          <StatusPieChart rows={filtered} onDrill={setDrillStatus} />
         </div>
 
         {/* Customer Feedback Chart */}
