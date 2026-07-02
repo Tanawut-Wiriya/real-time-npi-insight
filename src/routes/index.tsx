@@ -138,19 +138,8 @@ function Dashboard() {
     setYearInitialized(true);
   }, [years, yearInitialized]);
 
-  if (isLoading) return <DashboardSkeleton />;
-  if (error)
-    return (
-      <div className="flex min-h-screen items-center justify-center p-6 text-center">
-        <div>
-          <h2 className="text-xl font-semibold">โหลดข้อมูลไม่สำเร็จ</h2>
-          <p className="mt-2 text-sm text-muted-foreground">{(error as Error).message}</p>
-          <Button onClick={() => refetch()} className="mt-4">
-            <RefreshCw className="mr-2 h-4 w-4" /> ลองอีกครั้ง
-          </Button>
-        </div>
-      </div>
-    );
+  const [chartType, setChartType] = useState<"bar" | "line">("bar");
+  const [drillStatus, setDrillStatus] = useState<string | null>(null);
 
   const filtered = useMemo(
     () =>
@@ -163,7 +152,6 @@ function Dashboard() {
       ),
     [rows, year, month, status, product],
   );
-
 
   const chartData = useMemo(() => {
     const map = new Map<string, { YearMonth: string; Count: number }>();
@@ -185,7 +173,10 @@ function Dashboard() {
   );
   const onTime = filtered.filter((r) => /on time/i.test(r.Delivery)).length;
 
-  const [chartType, setChartType] = useState<"bar" | "line">("bar");
+  const drillRows = useMemo(
+    () => (drillStatus ? filtered.filter((r) => r.Status === drillStatus) : []),
+    [filtered, drillStatus],
+  );
 
   const reset = () => {
     setYear(ALL);
@@ -194,6 +185,19 @@ function Dashboard() {
     setProduct(ALL);
   };
 
+  if (isLoading) return <DashboardSkeleton />;
+  if (error)
+    return (
+      <div className="flex min-h-screen items-center justify-center p-6 text-center">
+        <div>
+          <h2 className="text-xl font-semibold">โหลดข้อมูลไม่สำเร็จ</h2>
+          <p className="mt-2 text-sm text-muted-foreground">{(error as Error).message}</p>
+          <Button onClick={() => refetch()} className="mt-4">
+            <RefreshCw className="mr-2 h-4 w-4" /> ลองอีกครั้ง
+          </Button>
+        </div>
+      </div>
+    );
 
   return (
     <div className="min-h-screen bg-background">
