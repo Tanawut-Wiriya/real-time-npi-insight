@@ -138,19 +138,8 @@ function Dashboard() {
     setYearInitialized(true);
   }, [years, yearInitialized]);
 
-  if (isLoading) return <DashboardSkeleton />;
-  if (error)
-    return (
-      <div className="flex min-h-screen items-center justify-center p-6 text-center">
-        <div>
-          <h2 className="text-xl font-semibold">โหลดข้อมูลไม่สำเร็จ</h2>
-          <p className="mt-2 text-sm text-muted-foreground">{(error as Error).message}</p>
-          <Button onClick={() => refetch()} className="mt-4">
-            <RefreshCw className="mr-2 h-4 w-4" /> ลองอีกครั้ง
-          </Button>
-        </div>
-      </div>
-    );
+  const [chartType, setChartType] = useState<"bar" | "line">("bar");
+  const [drillStatus, setDrillStatus] = useState<string | null>(null);
 
   const filtered = useMemo(
     () =>
@@ -163,7 +152,6 @@ function Dashboard() {
       ),
     [rows, year, month, status, product],
   );
-
 
   const chartData = useMemo(() => {
     const map = new Map<string, { YearMonth: string; Count: number }>();
@@ -185,7 +173,10 @@ function Dashboard() {
   );
   const onTime = filtered.filter((r) => /on time/i.test(r.Delivery)).length;
 
-  const [chartType, setChartType] = useState<"bar" | "line">("bar");
+  const drillRows = useMemo(
+    () => (drillStatus ? filtered.filter((r) => r.Status === drillStatus) : []),
+    [filtered, drillStatus],
+  );
 
   const reset = () => {
     setYear(ALL);
@@ -194,6 +185,19 @@ function Dashboard() {
     setProduct(ALL);
   };
 
+  if (isLoading) return <DashboardSkeleton />;
+  if (error)
+    return (
+      <div className="flex min-h-screen items-center justify-center p-6 text-center">
+        <div>
+          <h2 className="text-xl font-semibold">โหลดข้อมูลไม่สำเร็จ</h2>
+          <p className="mt-2 text-sm text-muted-foreground">{(error as Error).message}</p>
+          <Button onClick={() => refetch()} className="mt-4">
+            <RefreshCw className="mr-2 h-4 w-4" /> ลองอีกครั้ง
+          </Button>
+        </div>
+      </div>
+    );
 
   return (
     <div className="min-h-screen bg-background">
@@ -364,7 +368,7 @@ function Dashboard() {
           </Card>
 
           {/* Status Pie Chart */}
-          <StatusPieChart rows={filtered} />
+          <StatusPieChart rows={filtered} onDrill={setDrillStatus} />
         </div>
 
         {/* Customer Feedback Chart */}
@@ -373,6 +377,14 @@ function Dashboard() {
         {/* Table */}
         <DataTable rows={filtered} />
       </main>
+
+      {drillStatus && (
+        <StatusDrilldownModal
+          status={drillStatus}
+          rows={drillRows}
+          onClose={() => setDrillStatus(null)}
+        />
+      )}
     </div>
   );
 }
@@ -630,7 +642,13 @@ function EmptyState() {
   );
 }
 
-function StatusPieChart({ rows }: { rows: NpiRow[] }) {
+function StatusPieChart({
+  rows,
+  onDrill,
+}: {
+  rows: NpiRow[];
+  onDrill?: (status: string) => void;
+}) {
   const data = useMemo(() => {
     const map = new Map<string, number>();
     for (const r of rows) {
@@ -656,7 +674,7 @@ function StatusPieChart({ rows }: { rows: NpiRow[] }) {
       <div className="mb-4">
         <h2 className="text-lg font-semibold">Status of projects</h2>
         <p className="text-xs text-muted-foreground">
-          สัดส่วนสถานะของ Product ตามตัวกรองที่เลือก
+          สัดส่วนสถานะของ Product ตามตัวกรองที่เลือก · ดับเบิลคลิกที่ชิ้นส่วนเพื่อดูรายละเอียด
         </p>
       </div>
       {data.length === 0 ? (
@@ -684,9 +702,17 @@ function StatusPieChart({ rows }: { rows: NpiRow[] }) {
                 nameKey="name"
                 label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                 labelLine
+                onDoubleClick={(entry: { name?: string }) => {
+                  if (onDrill && entry?.name) onDrill(entry.name);
+                }}
+                style={{ cursor: onDrill ? "pointer" : "default" }}
               >
                 {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={getStatusColor(entry.name)} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={getStatusColor(entry.name)}
+                    onDoubleClick={() => onDrill?.(entry.name)}
+                  />
                 ))}
               </Pie>
             </PieChart>
@@ -694,6 +720,91 @@ function StatusPieChart({ rows }: { rows: NpiRow[] }) {
         </div>
       )}
     </Card>
+  );
+}
+
+function StatusDrilldownModal({
+  status,
+  rows,
+  onClose,
+}: {
+  status: string;
+  rows: NpiRow[];
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="relative flex max-h-[85vh] w-full max-w-5xl flex-col overflow-hidden rounded-lg border bg-card shadow-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between border-b px-5 py-4">
+          <div>
+            <h3 className="text-lg font-semibold">Products — {status}</h3>
+            <p className="text-xs text-muted-foreground">
+              จำนวน {rows.length.toLocaleString()} รายการที่อยู่ในสถานะนี้ (ตามตัวกรองปัจจุบัน)
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="rounded-md p-1.5 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
+        <div className="overflow-auto">
+          {rows.length === 0 ? (
+            <div className="p-10"><EmptyState /></div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/40 hover:bg-muted/40">
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide">No</TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide">Product</TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide">Article</TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide">Description</TableHead>
+                  <TableHead className="text-right text-xs font-semibold uppercase tracking-wide">QTY.</TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide">Start Date</TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide">Delivery</TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide">Shipment</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {rows.map((r) => (
+                  <TableRow key={r.No} className="text-sm">
+                    <TableCell className="font-mono text-xs text-muted-foreground">{r.No}</TableCell>
+                    <TableCell className="font-medium">{r.Product}</TableCell>
+                    <TableCell className="font-mono text-xs">{r.Article}</TableCell>
+                    <TableCell className="max-w-[280px] truncate" title={r.Description}>{r.Description}</TableCell>
+                    <TableCell className="text-right tabular-nums">{r.Quantity.toLocaleString()}</TableCell>
+                    <TableCell className="whitespace-nowrap">{r.YearMonth}</TableCell>
+                    <TableCell><DeliveryBadge value={r.Delivery} /></TableCell>
+                    <TableCell className="whitespace-nowrap text-xs">{r.Shipment}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 
