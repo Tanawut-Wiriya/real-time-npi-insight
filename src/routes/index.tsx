@@ -377,6 +377,14 @@ function Dashboard() {
         {/* Table */}
         <DataTable rows={filtered} />
       </main>
+
+      {drillStatus && (
+        <StatusDrilldownModal
+          status={drillStatus}
+          rows={drillRows}
+          onClose={() => setDrillStatus(null)}
+        />
+      )}
     </div>
   );
 }
