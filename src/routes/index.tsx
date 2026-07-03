@@ -171,7 +171,9 @@ function Dashboard() {
     () => filtered.filter((r) => /deliver/i.test(r.Status)).length,
     [filtered],
   );
-  const onTime = filtered.filter((r) => /on time/i.test(r.Delivery)).length;
+  const inProgress = filtered.filter(
+    (r) => /in production|in progress/i.test(r.Status),
+  ).length;
 
   const drillRows = useMemo(
     () => (drillStatus ? filtered.filter((r) => r.Status === drillStatus) : []),
@@ -284,8 +286,8 @@ function Dashboard() {
             icon={<Truck className="h-4 w-4" />}
           />
           <KpiCard
-            label="On-Time"
-            value={onTime.toLocaleString()}
+            label="In progress"
+            value={inProgress.toLocaleString()}
             icon={<LineIcon className="h-4 w-4" />}
           />
         </div>
