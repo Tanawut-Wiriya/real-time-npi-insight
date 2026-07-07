@@ -140,6 +140,7 @@ function Dashboard() {
 
   const [chartType, setChartType] = useState<"bar" | "line">("bar");
   const [drillStatus, setDrillStatus] = useState<string | null>(null);
+  const [showInProgress, setShowInProgress] = useState(false);
 
   const filtered = useMemo(
     () =>
@@ -174,6 +175,10 @@ function Dashboard() {
   const inProgress = filtered.filter(
     (r) => /in production|in progress/i.test(r.Status),
   ).length;
+  const inProgressRows = useMemo(
+    () => filtered.filter((r) => /in production|in progress/i.test(r.Status)),
+    [filtered],
+  );
 
   const drillRows = useMemo(
     () => (drillStatus ? filtered.filter((r) => r.Status === drillStatus) : []),
@@ -289,6 +294,7 @@ function Dashboard() {
             label="In progress"
             value={inProgress.toLocaleString()}
             icon={<LineIcon className="h-4 w-4" />}
+            onClick={() => setShowInProgress(true)}
           />
         </div>
 
@@ -380,6 +386,14 @@ function Dashboard() {
         <DataTable rows={filtered} />
       </main>
 
+      {showInProgress && (
+        <StatusDrilldownModal
+          status="In Progress"
+          rows={inProgressRows}
+          onClose={() => setShowInProgress(false)}
+        />
+      )}
+
       {drillStatus && (
         <StatusDrilldownModal
           status={drillStatus}
@@ -427,14 +441,28 @@ function KpiCard({
   value,
   icon,
   subValue,
+  onClick,
 }: {
   label: string;
   value: string;
   icon: React.ReactNode;
   subValue?: string;
+  onClick?: () => void;
 }) {
   return (
-    <Card className="p-4">
+    <Card
+      className={`p-4 ${onClick ? "cursor-pointer transition hover:bg-muted/50" : ""}`}
+      onClick={onClick}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") onClick();
+            }
+          : undefined
+      }
+    >
       <div className="flex items-center justify-between">
         <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           {label}
@@ -784,6 +812,7 @@ function StatusDrilldownModal({
                   <TableHead className="text-xs font-semibold uppercase tracking-wide">Description</TableHead>
                   <TableHead className="text-right text-xs font-semibold uppercase tracking-wide">QTY.</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide">Start Date</TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide">Status</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide">Delivery</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide">Shipment</TableHead>
                 </TableRow>
@@ -797,6 +826,7 @@ function StatusDrilldownModal({
                     <TableCell className="max-w-[280px] truncate" title={r.Description}>{r.Description}</TableCell>
                     <TableCell className="text-right tabular-nums">{r.Quantity.toLocaleString()}</TableCell>
                     <TableCell className="whitespace-nowrap">{r.YearMonth}</TableCell>
+                    <TableCell><StatusBadge value={r.Status} /></TableCell>
                     <TableCell><DeliveryBadge value={r.Delivery} /></TableCell>
                     <TableCell className="whitespace-nowrap text-xs">{r.Shipment}</TableCell>
                   </TableRow>
