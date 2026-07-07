@@ -140,6 +140,7 @@ function Dashboard() {
 
   const [chartType, setChartType] = useState<"bar" | "line">("bar");
   const [drillStatus, setDrillStatus] = useState<string | null>(null);
+  const [showInProgress, setShowInProgress] = useState(false);
 
   const filtered = useMemo(
     () =>
@@ -174,6 +175,10 @@ function Dashboard() {
   const inProgress = filtered.filter(
     (r) => /in production|in progress/i.test(r.Status),
   ).length;
+  const inProgressRows = useMemo(
+    () => filtered.filter((r) => /in production|in progress/i.test(r.Status)),
+    [filtered],
+  );
 
   const drillRows = useMemo(
     () => (drillStatus ? filtered.filter((r) => r.Status === drillStatus) : []),
