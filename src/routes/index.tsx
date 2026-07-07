@@ -427,14 +427,28 @@ function KpiCard({
   value,
   icon,
   subValue,
+  onClick,
 }: {
   label: string;
   value: string;
   icon: React.ReactNode;
   subValue?: string;
+  onClick?: () => void;
 }) {
   return (
-    <Card className="p-4">
+    <Card
+      className={`p-4 ${onClick ? "cursor-pointer transition hover:bg-muted/50" : ""}`}
+      onClick={onClick}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") onClick();
+            }
+          : undefined
+      }
+    >
       <div className="flex items-center justify-between">
         <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           {label}
