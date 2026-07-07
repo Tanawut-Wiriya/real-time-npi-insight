@@ -386,6 +386,14 @@ function Dashboard() {
         <DataTable rows={filtered} />
       </main>
 
+      {showInProgress && (
+        <StatusDrilldownModal
+          status="In Progress"
+          rows={inProgressRows}
+          onClose={() => setShowInProgress(false)}
+        />
+      )}
+
       {drillStatus && (
         <StatusDrilldownModal
           status={drillStatus}
