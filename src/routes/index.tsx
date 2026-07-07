@@ -294,6 +294,7 @@ function Dashboard() {
             label="In progress"
             value={inProgress.toLocaleString()}
             icon={<LineIcon className="h-4 w-4" />}
+            onClick={() => setShowInProgress(true)}
           />
         </div>
 
