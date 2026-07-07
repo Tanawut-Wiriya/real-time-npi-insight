@@ -812,6 +812,7 @@ function StatusDrilldownModal({
                   <TableHead className="text-xs font-semibold uppercase tracking-wide">Description</TableHead>
                   <TableHead className="text-right text-xs font-semibold uppercase tracking-wide">QTY.</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide">Start Date</TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide">Status</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide">Delivery</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide">Shipment</TableHead>
                 </TableRow>
@@ -825,6 +826,7 @@ function StatusDrilldownModal({
                     <TableCell className="max-w-[280px] truncate" title={r.Description}>{r.Description}</TableCell>
                     <TableCell className="text-right tabular-nums">{r.Quantity.toLocaleString()}</TableCell>
                     <TableCell className="whitespace-nowrap">{r.YearMonth}</TableCell>
+                    <TableCell><StatusBadge value={r.Status} /></TableCell>
                     <TableCell><DeliveryBadge value={r.Delivery} /></TableCell>
                     <TableCell className="whitespace-nowrap text-xs">{r.Shipment}</TableCell>
                   </TableRow>
