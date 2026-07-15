@@ -66,6 +66,21 @@ export const Route = createFileRoute("/")({
 
 const ALL = "__all__";
 
+function parseDateStr(s: string): Date | null {
+  if (!s || s === "-") return null;
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return null;
+  const d = new Date(`${m[1]}-${m[2]}-${m[3]}T00:00:00Z`);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function shipmentStatus(shipment: string, estimate: string): "on-time" | "delay" | "unknown" {
+  const s = parseDateStr(shipment);
+  const e = parseDateStr(estimate);
+  if (!s || !e) return "unknown";
+  return s.getTime() <= e.getTime() ? "on-time" : "delay";
+}
+
 function DashboardPage() {
   const [view, setView] = useState<"npi" | "asml">("npi");
   return (
@@ -141,6 +156,9 @@ function Dashboard() {
   const [chartType, setChartType] = useState<"bar" | "line">("bar");
   const [drillStatus, setDrillStatus] = useState<string | null>(null);
   const [showInProgress, setShowInProgress] = useState(false);
+  const [showTotal, setShowTotal] = useState(false);
+  const [showDelivered, setShowDelivered] = useState(false);
+  const [deliveredFilter, setDeliveredFilter] = useState<"all" | "ontime" | "delay">("all");
 
   const filtered = useMemo(
     () =>
@@ -179,6 +197,32 @@ function Dashboard() {
     () => filtered.filter((r) => /in production|in progress/i.test(r.Status)),
     [filtered],
   );
+
+  const deliveredRows = useMemo(
+    () => filtered.filter((r) => /deliver/i.test(r.Status)),
+    [filtered],
+  );
+
+  const deliveredShipment = useMemo(() => {
+    let onTime = 0;
+    let delay = 0;
+    let unknown = 0;
+    const withStatus = deliveredRows.map((r) => {
+      const s = shipmentStatus(r.Shipment, r.EstimateShipment);
+      if (s === "on-time") onTime++;
+      else if (s === "delay") delay++;
+      else unknown++;
+      return { row: r, shipStatus: s };
+    });
+    return { onTime, delay, unknown, withStatus };
+  }, [deliveredRows]);
+
+  const deliveredDrillRows = useMemo(() => {
+    if (deliveredFilter === "all") return deliveredRows;
+    return deliveredShipment.withStatus
+      .filter((x) => x.shipStatus === deliveredFilter)
+      .map((x) => x.row);
+  }, [deliveredFilter, deliveredRows, deliveredShipment]);
 
   const drillRows = useMemo(
     () => (drillStatus ? filtered.filter((r) => r.Status === drillStatus) : []),
@@ -279,6 +323,7 @@ function Dashboard() {
             label="Total Projects"
             value={filtered.length.toLocaleString()}
             icon={<Package className="h-4 w-4" />}
+            onClick={() => setShowTotal(true)}
           />
           <KpiCard
             label="Total Quantity"
@@ -289,6 +334,10 @@ function Dashboard() {
             label="Delivered"
             value={delivered.toLocaleString()}
             icon={<Truck className="h-4 w-4" />}
+            onClick={() => {
+              setDeliveredFilter("all");
+              setShowDelivered(true);
+            }}
           />
           <KpiCard
             label="In progress"
@@ -379,6 +428,17 @@ function Dashboard() {
           <StatusPieChart rows={filtered} onDrill={setDrillStatus} />
         </div>
 
+        {/* Delivered Shipment (On-time vs Delay) */}
+        <DeliveredShipmentChart
+          onTime={deliveredShipment.onTime}
+          delay={deliveredShipment.delay}
+          unknown={deliveredShipment.unknown}
+          onDrill={(f) => {
+            setDeliveredFilter(f);
+            setShowDelivered(true);
+          }}
+        />
+
         {/* Customer Feedback Chart */}
         <FeedbackChart rows={filtered} />
 
@@ -391,6 +451,28 @@ function Dashboard() {
           status="In Progress"
           rows={inProgressRows}
           onClose={() => setShowInProgress(false)}
+        />
+      )}
+
+      {showTotal && (
+        <StatusDrilldownModal
+          status="Total Projects"
+          rows={filtered}
+          onClose={() => setShowTotal(false)}
+        />
+      )}
+
+      {showDelivered && (
+        <StatusDrilldownModal
+          status={
+            deliveredFilter === "all"
+              ? "Delivered"
+              : deliveredFilter === "ontime"
+                ? "Delivered — On-time"
+                : "Delivered — Delay"
+          }
+          rows={deliveredDrillRows}
+          onClose={() => setShowDelivered(false)}
         />
       )}
 
@@ -897,6 +979,120 @@ function FeedbackChart({ rows }: { rows: NpiRow[] }) {
               </Pie>
             </PieChart>
           </ResponsiveContainer>
+        </div>
+      )}
+    </Card>
+  );
+}
+
+function DeliveredShipmentChart({
+  onTime,
+  delay,
+  unknown,
+  onDrill,
+}: {
+  onTime: number;
+  delay: number;
+  unknown: number;
+  onDrill: (f: "all" | "ontime" | "delay") => void;
+}) {
+  const total = onTime + delay + unknown;
+  const data = [
+    { key: "ontime" as const, name: "On-time", value: onTime, color: "#22c55e" },
+    { key: "delay" as const, name: "Delay", value: delay, color: "#ef4444" },
+    { key: "unknown" as const, name: "No date", value: unknown, color: "#94a3b8" },
+  ].filter((d) => d.value > 0);
+
+  const pct = (v: number) => (total ? ((v / total) * 100).toFixed(1) : "0.0");
+
+  return (
+    <Card className="p-5">
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold">Delivered — Shipment vs Estimate</h2>
+        <p className="text-xs text-muted-foreground">
+          เปรียบเทียบวันจริง (Shipment) กับวันประมาณ (Estimate Shipment) ของสินค้าสถานะ Delivered ·
+          ดับเบิลคลิกที่ชิ้นส่วนเพื่อดูรายละเอียด
+        </p>
+      </div>
+      {total === 0 ? (
+        <EmptyState />
+      ) : (
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_260px]">
+          <div className="h-[320px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Tooltip
+                  contentStyle={{
+                    background: "var(--popover)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 8,
+                    fontFamily: "Kanit",
+                  }}
+                  formatter={(value: number, name: string) => [
+                    `${value.toLocaleString()} รายการ (${pct(value)}%)`,
+                    name,
+                  ]}
+                />
+                <Legend />
+                <Pie
+                  data={data}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={110}
+                  dataKey="value"
+                  nameKey="name"
+                  label={({ name, percent }) =>
+                    `${name}: ${(percent * 100).toFixed(1)}%`
+                  }
+                  labelLine
+                  onDoubleClick={(entry: { key?: "ontime" | "delay" | "unknown" }) => {
+                    if (entry?.key === "ontime" || entry?.key === "delay") onDrill(entry.key);
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  {data.map((entry) => (
+                    <Cell
+                      key={entry.key}
+                      fill={entry.color}
+                      onDoubleClick={() => {
+                        if (entry.key === "ontime" || entry.key === "delay") onDrill(entry.key);
+                      }}
+                    />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="flex flex-col justify-center gap-2">
+            {data.map((d) => (
+              <button
+                key={d.key}
+                onClick={() => {
+                  if (d.key === "ontime" || d.key === "delay") onDrill(d.key);
+                }}
+                className="flex items-center justify-between rounded-md border p-3 text-left transition hover:bg-muted/50"
+              >
+                <div className="flex items-center gap-2">
+                  <span
+                    className="inline-block h-3 w-3 rounded-sm"
+                    style={{ backgroundColor: d.color }}
+                  />
+                  <span className="text-sm font-medium">{d.name}</span>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm font-semibold tabular-nums">
+                    {d.value.toLocaleString()}
+                  </div>
+                  <div className="text-xs text-muted-foreground tabular-nums">
+                    {pct(d.value)}%
+                  </div>
+                </div>
+              </button>
+            ))}
+            <div className="mt-1 border-t pt-2 text-xs text-muted-foreground">
+              รวม {total.toLocaleString()} รายการ
+            </div>
+          </div>
         </div>
       )}
     </Card>
