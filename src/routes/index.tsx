@@ -66,6 +66,21 @@ export const Route = createFileRoute("/")({
 
 const ALL = "__all__";
 
+function parseDateStr(s: string): Date | null {
+  if (!s || s === "-") return null;
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return null;
+  const d = new Date(`${m[1]}-${m[2]}-${m[3]}T00:00:00Z`);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function shipmentStatus(shipment: string, estimate: string): "on-time" | "delay" | "unknown" {
+  const s = parseDateStr(shipment);
+  const e = parseDateStr(estimate);
+  if (!s || !e) return "unknown";
+  return s.getTime() <= e.getTime() ? "on-time" : "delay";
+}
+
 function DashboardPage() {
   const [view, setView] = useState<"npi" | "asml">("npi");
   return (
