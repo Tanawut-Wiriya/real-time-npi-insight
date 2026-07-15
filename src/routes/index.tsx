@@ -183,6 +183,32 @@ function Dashboard() {
     [filtered],
   );
 
+  const deliveredRows = useMemo(
+    () => filtered.filter((r) => /deliver/i.test(r.Status)),
+    [filtered],
+  );
+
+  const deliveredShipment = useMemo(() => {
+    let onTime = 0;
+    let delay = 0;
+    let unknown = 0;
+    const withStatus = deliveredRows.map((r) => {
+      const s = shipmentStatus(r.Shipment, r.EstimateShipment);
+      if (s === "on-time") onTime++;
+      else if (s === "delay") delay++;
+      else unknown++;
+      return { row: r, shipStatus: s };
+    });
+    return { onTime, delay, unknown, withStatus };
+  }, [deliveredRows]);
+
+  const deliveredDrillRows = useMemo(() => {
+    if (deliveredFilter === "all") return deliveredRows;
+    return deliveredShipment.withStatus
+      .filter((x) => x.shipStatus === deliveredFilter)
+      .map((x) => x.row);
+  }, [deliveredFilter, deliveredRows, deliveredShipment]);
+
   const drillRows = useMemo(
     () => (drillStatus ? filtered.filter((r) => r.Status === drillStatus) : []),
     [filtered, drillStatus],
