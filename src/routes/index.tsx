@@ -985,6 +985,120 @@ function FeedbackChart({ rows }: { rows: NpiRow[] }) {
   );
 }
 
+function DeliveredShipmentChart({
+  onTime,
+  delay,
+  unknown,
+  onDrill,
+}: {
+  onTime: number;
+  delay: number;
+  unknown: number;
+  onDrill: (f: "all" | "ontime" | "delay") => void;
+}) {
+  const total = onTime + delay + unknown;
+  const data = [
+    { key: "ontime" as const, name: "On-time", value: onTime, color: "#22c55e" },
+    { key: "delay" as const, name: "Delay", value: delay, color: "#ef4444" },
+    { key: "unknown" as const, name: "No date", value: unknown, color: "#94a3b8" },
+  ].filter((d) => d.value > 0);
+
+  const pct = (v: number) => (total ? ((v / total) * 100).toFixed(1) : "0.0");
+
+  return (
+    <Card className="p-5">
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold">Delivered — Shipment vs Estimate</h2>
+        <p className="text-xs text-muted-foreground">
+          เปรียบเทียบวันจริง (Shipment) กับวันประมาณ (Estimate Shipment) ของสินค้าสถานะ Delivered ·
+          ดับเบิลคลิกที่ชิ้นส่วนเพื่อดูรายละเอียด
+        </p>
+      </div>
+      {total === 0 ? (
+        <EmptyState />
+      ) : (
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_260px]">
+          <div className="h-[320px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Tooltip
+                  contentStyle={{
+                    background: "var(--popover)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 8,
+                    fontFamily: "Kanit",
+                  }}
+                  formatter={(value: number, name: string) => [
+                    `${value.toLocaleString()} รายการ (${pct(value)}%)`,
+                    name,
+                  ]}
+                />
+                <Legend />
+                <Pie
+                  data={data}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={110}
+                  dataKey="value"
+                  nameKey="name"
+                  label={({ name, percent }) =>
+                    `${name}: ${(percent * 100).toFixed(1)}%`
+                  }
+                  labelLine
+                  onDoubleClick={(entry: { key?: "ontime" | "delay" | "unknown" }) => {
+                    if (entry?.key === "ontime" || entry?.key === "delay") onDrill(entry.key);
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
+                  {data.map((entry) => (
+                    <Cell
+                      key={entry.key}
+                      fill={entry.color}
+                      onDoubleClick={() => {
+                        if (entry.key === "ontime" || entry.key === "delay") onDrill(entry.key);
+                      }}
+                    />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="flex flex-col justify-center gap-2">
+            {data.map((d) => (
+              <button
+                key={d.key}
+                onClick={() => {
+                  if (d.key === "ontime" || d.key === "delay") onDrill(d.key);
+                }}
+                className="flex items-center justify-between rounded-md border p-3 text-left transition hover:bg-muted/50"
+              >
+                <div className="flex items-center gap-2">
+                  <span
+                    className="inline-block h-3 w-3 rounded-sm"
+                    style={{ backgroundColor: d.color }}
+                  />
+                  <span className="text-sm font-medium">{d.name}</span>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm font-semibold tabular-nums">
+                    {d.value.toLocaleString()}
+                  </div>
+                  <div className="text-xs text-muted-foreground tabular-nums">
+                    {pct(d.value)}%
+                  </div>
+                </div>
+              </button>
+            ))}
+            <div className="mt-1 border-t pt-2 text-xs text-muted-foreground">
+              รวม {total.toLocaleString()} รายการ
+            </div>
+          </div>
+        </div>
+      )}
+    </Card>
+  );
+}
+
 function DashboardSkeleton() {
   return (
     <div className="min-h-screen bg-background">
