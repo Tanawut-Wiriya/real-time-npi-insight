@@ -141,6 +141,9 @@ function Dashboard() {
   const [chartType, setChartType] = useState<"bar" | "line">("bar");
   const [drillStatus, setDrillStatus] = useState<string | null>(null);
   const [showInProgress, setShowInProgress] = useState(false);
+  const [showTotal, setShowTotal] = useState(false);
+  const [showDelivered, setShowDelivered] = useState(false);
+  const [deliveredFilter, setDeliveredFilter] = useState<"all" | "ontime" | "delay">("all");
 
   const filtered = useMemo(
     () =>
