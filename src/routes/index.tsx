@@ -428,6 +428,17 @@ function Dashboard() {
           <StatusPieChart rows={filtered} onDrill={setDrillStatus} />
         </div>
 
+        {/* Delivered Shipment (On-time vs Delay) */}
+        <DeliveredShipmentChart
+          onTime={deliveredShipment.onTime}
+          delay={deliveredShipment.delay}
+          unknown={deliveredShipment.unknown}
+          onDrill={(f) => {
+            setDeliveredFilter(f);
+            setShowDelivered(true);
+          }}
+        />
+
         {/* Customer Feedback Chart */}
         <FeedbackChart rows={filtered} />
 
@@ -440,6 +451,28 @@ function Dashboard() {
           status="In Progress"
           rows={inProgressRows}
           onClose={() => setShowInProgress(false)}
+        />
+      )}
+
+      {showTotal && (
+        <StatusDrilldownModal
+          status="Total Projects"
+          rows={filtered}
+          onClose={() => setShowTotal(false)}
+        />
+      )}
+
+      {showDelivered && (
+        <StatusDrilldownModal
+          status={
+            deliveredFilter === "all"
+              ? "Delivered"
+              : deliveredFilter === "ontime"
+                ? "Delivered — On-time"
+                : "Delivered — Delay"
+          }
+          rows={deliveredDrillRows}
+          onClose={() => setShowDelivered(false)}
         />
       )}
 
