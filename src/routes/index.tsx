@@ -323,6 +323,7 @@ function Dashboard() {
             label="Total Projects"
             value={filtered.length.toLocaleString()}
             icon={<Package className="h-4 w-4" />}
+            onClick={() => setShowTotal(true)}
           />
           <KpiCard
             label="Total Quantity"
@@ -333,6 +334,10 @@ function Dashboard() {
             label="Delivered"
             value={delivered.toLocaleString()}
             icon={<Truck className="h-4 w-4" />}
+            onClick={() => {
+              setDeliveredFilter("all");
+              setShowDelivered(true);
+            }}
           />
           <KpiCard
             label="In progress"
