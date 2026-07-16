@@ -507,6 +507,14 @@ function Dashboard() {
           onClose={() => setDrillStatus(null)}
         />
       )}
+
+      {deliveredMonth && (
+        <StatusDrilldownModal
+          status={`Delivered — ${deliveredMonth}`}
+          rows={deliveredMonthRows}
+          onClose={() => setDeliveredMonth(null)}
+        />
+      )}
     </div>
   );
 }
