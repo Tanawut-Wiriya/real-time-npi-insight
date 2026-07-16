@@ -225,6 +225,34 @@ function Dashboard() {
       .map((x) => x.row);
   }, [deliveredFilter, deliveredRows, deliveredShipment]);
 
+  const deliveredByMonth = useMemo(() => {
+    const map = new Map<string, { month: string; onTime: number; delay: number; unknown: number; total: number }>();
+    for (const { row, shipStatus } of deliveredShipment.withStatus) {
+      const m = row.Shipment && row.Shipment !== "-" ? row.Shipment.slice(0, 7) : "No date";
+      const cur = map.get(m) ?? { month: m, onTime: 0, delay: 0, unknown: 0, total: 0 };
+      if (shipStatus === "on-time") cur.onTime++;
+      else if (shipStatus === "delay") cur.delay++;
+      else cur.unknown++;
+      cur.total++;
+      map.set(m, cur);
+    }
+    const arr = Array.from(map.values()).sort((a, b) => b.total - a.total);
+    const grand = arr.reduce((s, x) => s + x.total, 0);
+    let cum = 0;
+    return arr.map((x) => {
+      cum += x.total;
+      return { ...x, cumulativePct: grand ? +((cum / grand) * 100).toFixed(1) : 0 };
+    });
+  }, [deliveredShipment]);
+
+  const deliveredMonthRows = useMemo(() => {
+    if (!deliveredMonth) return [];
+    return deliveredRows.filter((r) => {
+      const m = r.Shipment && r.Shipment !== "-" ? r.Shipment.slice(0, 7) : "No date";
+      return m === deliveredMonth;
+    });
+  }, [deliveredMonth, deliveredRows]);
+
   const drillRows = useMemo(
     () => (drillStatus ? filtered.filter((r) => r.Status === drillStatus) : []),
     [filtered, drillStatus],
