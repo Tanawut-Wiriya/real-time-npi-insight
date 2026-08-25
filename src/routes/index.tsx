@@ -468,7 +468,9 @@ function Dashboard() {
               ? "Delivered"
               : deliveredFilter === "ontime"
                 ? "Delivered — On-time"
-                : "Delivered — Delay"
+                : deliveredFilter === "delay"
+                  ? "Delivered — Delay"
+                  : "Delivered — No date"
           }
           rows={deliveredDrillRows}
           onClose={() => setShowDelivered(false)}
@@ -480,14 +482,6 @@ function Dashboard() {
           status={drillStatus}
           rows={drillRows}
           onClose={() => setDrillStatus(null)}
-        />
-      )}
-
-      {deliveredMonth && (
-        <StatusDrilldownModal
-          status={`Delivered — ${deliveredMonth}`}
-          rows={deliveredMonthRows}
-          onClose={() => setDeliveredMonth(null)}
         />
       )}
     </div>
