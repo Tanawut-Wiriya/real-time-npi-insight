@@ -6,7 +6,6 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
-  ComposedChart,
   Legend,
   Line,
   LineChart,
@@ -16,6 +15,7 @@ import {
   Tooltip,
   XAxis,
   YAxis,
+
 } from "recharts";
 import {
   ArrowDown,
