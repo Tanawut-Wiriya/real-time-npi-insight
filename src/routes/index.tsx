@@ -158,8 +158,8 @@ function Dashboard() {
   const [showInProgress, setShowInProgress] = useState(false);
   const [showTotal, setShowTotal] = useState(false);
   const [showDelivered, setShowDelivered] = useState(false);
-  const [deliveredFilter, setDeliveredFilter] = useState<"all" | "ontime" | "delay">("all");
-  const [deliveredMonth, setDeliveredMonth] = useState<string | null>(null);
+  const [deliveredFilter, setDeliveredFilter] = useState<"all" | "ontime" | "delay" | "unknown">("all");
+
 
   const filtered = useMemo(
     () =>
