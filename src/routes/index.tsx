@@ -621,7 +621,7 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
     <Card className="overflow-hidden p-0">
       <div className="flex items-center justify-between border-b px-5 py-4">
         <div>
-          <h2 className="text-lg font-semibold">Filtered Records</h2>
+          <h2 className="text-lg font-semibold">Projects List</h2>
           <p className="text-xs text-muted-foreground">
             {rows.length.toLocaleString()} รายการ
           </p>
