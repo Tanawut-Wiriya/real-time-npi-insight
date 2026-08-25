@@ -14,6 +14,9 @@ export interface NpiRow {
   YearMonth: string; // normalized "YYYY-MM"
   Status: string;
   Delivery: string;
+  Start: string; // YYYY-MM-DD or raw text
+  Request: string;
+  Plan: string; // YYYY-MM-DD or raw text
   CustomerFeedback: string;
   EstimateShipment: string;
   Shipment: string;
