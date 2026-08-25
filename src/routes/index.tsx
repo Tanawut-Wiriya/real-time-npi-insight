@@ -429,17 +429,19 @@ function Dashboard() {
           <StatusPieChart rows={filtered} onDrill={setDrillStatus} />
         </div>
 
-        {/* Delivered Shipment — On-time vs Delay (donut, aggregated by year) */}
-        <DeliveredShipmentChart
-          rows={deliveredRows}
-          onDrill={(status) => {
-            setDeliveredFilter(status);
-            setShowDelivered(true);
-          }}
-        />
+        {/* Delivered & Feedback side by side */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <DeliveredShipmentChart
+            rows={deliveredRows}
+            onDrill={(status) => {
+              setDeliveredFilter(status);
+              setShowDelivered(true);
+            }}
+          />
 
-        {/* Customer Feedback Chart */}
-        <FeedbackChart rows={filtered} />
+          {/* Customer Feedback Chart */}
+          <FeedbackChart rows={filtered} />
+        </div>
 
         {/* Table */}
         <DataTable rows={filtered} />
