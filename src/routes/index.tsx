@@ -15,7 +15,6 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-
 } from "recharts";
 import {
   ArrowDown,
