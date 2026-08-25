@@ -674,14 +674,19 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
                       {r.Quantity.toLocaleString()}
                     </TableCell>
                     <TableCell className="whitespace-nowrap">{r.YearMonth}</TableCell>
+                    <TableCell className="whitespace-nowrap text-xs">{r.Start}</TableCell>
+                    <TableCell className="max-w-[180px] truncate text-xs" title={r.Request}>
+                      {r.Request || "-"}
+                    </TableCell>
                     <TableCell>
                       <StatusBadge value={r.Status} />
                     </TableCell>
                     <TableCell>
                       <DeliveryBadge value={r.Delivery} />
                     </TableCell>
-                    <TableCell className="whitespace-nowrap text-xs">{r.EstimateShipment}</TableCell>
+                    <TableCell className="whitespace-nowrap text-xs">{r.Plan}</TableCell>
                     <TableCell className="whitespace-nowrap text-xs">{r.Shipment}</TableCell>
+                    <TableCell className="whitespace-nowrap text-xs">{r.EstimateShipment}</TableCell>
                     <TableCell className="max-w-[240px] truncate text-xs" title={r.CustomerFeedback}>
                       {r.CustomerFeedback || "-"}
                     </TableCell>
