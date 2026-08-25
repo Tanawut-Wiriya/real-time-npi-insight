@@ -6,7 +6,6 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
-  ComposedChart,
   Legend,
   Line,
   LineChart,
@@ -159,8 +158,8 @@ function Dashboard() {
   const [showInProgress, setShowInProgress] = useState(false);
   const [showTotal, setShowTotal] = useState(false);
   const [showDelivered, setShowDelivered] = useState(false);
-  const [deliveredFilter, setDeliveredFilter] = useState<"all" | "ontime" | "delay">("all");
-  const [deliveredMonth, setDeliveredMonth] = useState<string | null>(null);
+  const [deliveredFilter, setDeliveredFilter] = useState<"all" | "ontime" | "delay" | "unknown">("all");
+
 
   const filtered = useMemo(
     () =>
@@ -225,34 +224,6 @@ function Dashboard() {
       .filter((x) => x.shipStatus === deliveredFilter)
       .map((x) => x.row);
   }, [deliveredFilter, deliveredRows, deliveredShipment]);
-
-  const deliveredByMonth = useMemo(() => {
-    const map = new Map<string, { month: string; onTime: number; delay: number; unknown: number; total: number }>();
-    for (const { row, shipStatus } of deliveredShipment.withStatus) {
-      const m = row.Shipment && row.Shipment !== "-" ? row.Shipment.slice(0, 7) : "No date";
-      const cur = map.get(m) ?? { month: m, onTime: 0, delay: 0, unknown: 0, total: 0 };
-      if (shipStatus === "on-time") cur.onTime++;
-      else if (shipStatus === "delay") cur.delay++;
-      else cur.unknown++;
-      cur.total++;
-      map.set(m, cur);
-    }
-    const arr = Array.from(map.values()).sort((a, b) => b.total - a.total);
-    const grand = arr.reduce((s, x) => s + x.total, 0);
-    let cum = 0;
-    return arr.map((x) => {
-      cum += x.total;
-      return { ...x, cumulativePct: grand ? +((cum / grand) * 100).toFixed(1) : 0 };
-    });
-  }, [deliveredShipment]);
-
-  const deliveredMonthRows = useMemo(() => {
-    if (!deliveredMonth) return [];
-    return deliveredRows.filter((r) => {
-      const m = r.Shipment && r.Shipment !== "-" ? r.Shipment.slice(0, 7) : "No date";
-      return m === deliveredMonth;
-    });
-  }, [deliveredMonth, deliveredRows]);
 
   const drillRows = useMemo(
     () => (drillStatus ? filtered.filter((r) => r.Status === drillStatus) : []),
@@ -458,10 +429,13 @@ function Dashboard() {
           <StatusPieChart rows={filtered} onDrill={setDrillStatus} />
         </div>
 
-        {/* Delivered Shipment (On-time vs Delay) — per Shipment month */}
+        {/* Delivered Shipment — On-time vs Delay (donut, aggregated by year) */}
         <DeliveredShipmentChart
-          data={deliveredByMonth}
-          onDrillMonth={(m) => setDeliveredMonth(m)}
+          rows={deliveredRows}
+          onDrill={(status) => {
+            setDeliveredFilter(status);
+            setShowDelivered(true);
+          }}
         />
 
         {/* Customer Feedback Chart */}
@@ -494,7 +468,9 @@ function Dashboard() {
               ? "Delivered"
               : deliveredFilter === "ontime"
                 ? "Delivered — On-time"
-                : "Delivered — Delay"
+                : deliveredFilter === "delay"
+                  ? "Delivered — Delay"
+                  : "Delivered — No date"
           }
           rows={deliveredDrillRows}
           onClose={() => setShowDelivered(false)}
@@ -506,14 +482,6 @@ function Dashboard() {
           status={drillStatus}
           rows={drillRows}
           onClose={() => setDrillStatus(null)}
-        />
-      )}
-
-      {deliveredMonth && (
-        <StatusDrilldownModal
-          status={`Delivered — ${deliveredMonth}`}
-          rows={deliveredMonthRows}
-          onClose={() => setDeliveredMonth(null)}
         />
       )}
     </div>
@@ -1018,32 +986,40 @@ function FeedbackChart({ rows }: { rows: NpiRow[] }) {
   );
 }
 
-interface DeliveredMonthDatum {
-  month: string;
-  onTime: number;
-  delay: number;
-  unknown: number;
-  total: number;
-  cumulativePct: number;
-}
-
 function DeliveredShipmentChart({
-  data,
-  onDrillMonth,
+  rows,
+  onDrill,
 }: {
-  data: DeliveredMonthDatum[];
-  onDrillMonth: (month: string) => void;
+  rows: NpiRow[];
+  onDrill?: (status: "ontime" | "delay" | "unknown") => void;
 }) {
-  const totals = data.reduce(
-    (s, d) => ({
-      onTime: s.onTime + d.onTime,
-      delay: s.delay + d.delay,
-      unknown: s.unknown + d.unknown,
-      total: s.total + d.total,
-    }),
-    { onTime: 0, delay: 0, unknown: 0, total: 0 },
-  );
-  const pct = (v: number) => (totals.total ? ((v / totals.total) * 100).toFixed(1) : "0.0");
+  const data = useMemo(() => {
+    let onTime = 0;
+    let delay = 0;
+    let unknown = 0;
+    for (const r of rows) {
+      const s = shipmentStatus(r.Shipment, r.EstimateShipment);
+      if (s === "on-time") onTime++;
+      else if (s === "delay") delay++;
+      else unknown++;
+    }
+    const arr = [
+      { key: "ontime", name: "On-time", value: onTime, color: "#22c55e" },
+      { key: "delay", name: "Delay", value: delay, color: "#ef4444" },
+    ] as const;
+    if (unknown > 0) {
+      (arr as unknown as Array<{ key: string; name: string; value: number; color: string }>).push({
+        key: "unknown",
+        name: "No date",
+        value: unknown,
+        color: "#94a3b8",
+      });
+    }
+    return arr;
+  }, [rows]);
+
+  const total = rows.length;
+  const pct = (v: number) => (total ? ((v / total) * 100).toFixed(1) : "0.0");
 
   return (
     <Card className="p-5">
@@ -1051,42 +1027,27 @@ function DeliveredShipmentChart({
         <div>
           <h2 className="text-lg font-semibold">Delivered — Shipment vs Estimate</h2>
           <p className="text-xs text-muted-foreground">
-            แยกตามเดือนของ Shipment · เปรียบเทียบ On-time กับ Delay · คลิกที่แท่งเพื่อดูรายละเอียด
+            สรุปรวมทั้งปี · เปรียบเทียบ On-time กับ Delay · ดับเบิลคลิกที่ชิ้นส่วนเพื่อดูรายละเอียด
           </p>
         </div>
         <div className="flex flex-wrap gap-2 text-xs">
-          <span className="rounded-md border px-2 py-1">
-            <span className="mr-1 inline-block h-2 w-2 rounded-sm align-middle" style={{ backgroundColor: "#22c55e" }} />
-            On-time {totals.onTime.toLocaleString()} ({pct(totals.onTime)}%)
-          </span>
-          <span className="rounded-md border px-2 py-1">
-            <span className="mr-1 inline-block h-2 w-2 rounded-sm align-middle" style={{ backgroundColor: "#ef4444" }} />
-            Delay {totals.delay.toLocaleString()} ({pct(totals.delay)}%)
-          </span>
-          {totals.unknown > 0 && (
-            <span className="rounded-md border px-2 py-1">
-              <span className="mr-1 inline-block h-2 w-2 rounded-sm align-middle" style={{ backgroundColor: "#94a3b8" }} />
-              No date {totals.unknown.toLocaleString()}
+          {data.map((d) => (
+            <span key={d.key} className="rounded-md border px-2 py-1">
+              <span
+                className="mr-1 inline-block h-2 w-2 rounded-sm align-middle"
+                style={{ backgroundColor: d.color }}
+              />
+              {d.name} {d.value.toLocaleString()} ({pct(d.value)}%)
             </span>
-          )}
+          ))}
         </div>
       </div>
-      {data.length === 0 ? (
+      {total === 0 ? (
         <EmptyState />
       ) : (
-        <div className="h-[380px] w-full">
+        <div className="h-[340px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={data} margin={{ top: 10, right: 40, left: 0, bottom: 10 }}>
-              <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-              <XAxis dataKey="month" tick={{ fontSize: 12, fontFamily: "Kanit" }} />
-              <YAxis yAxisId="left" allowDecimals={false} tick={{ fontSize: 12, fontFamily: "Kanit" }} />
-              <YAxis
-                yAxisId="right"
-                orientation="right"
-                domain={[0, 100]}
-                unit="%"
-                tick={{ fontSize: 12, fontFamily: "Kanit" }}
-              />
+            <PieChart>
               <Tooltip
                 contentStyle={{
                   background: "var(--popover)",
@@ -1094,51 +1055,30 @@ function DeliveredShipmentChart({
                   borderRadius: 8,
                   fontFamily: "Kanit",
                 }}
-                formatter={(value: number, name: string) => {
-                  if (name === "Cumulative %") return [`${value}%`, name];
-                  return [value.toLocaleString(), name];
-                }}
+                formatter={(value: number, name: string) => [`${value.toLocaleString()} รายการ`, name]}
               />
               <Legend />
-              <Bar
-                yAxisId="left"
-                dataKey="onTime"
-                stackId="s"
-                name="On-time"
-                fill="#22c55e"
-                cursor="pointer"
-                onClick={(d: DeliveredMonthDatum) => d?.month && onDrillMonth(d.month)}
-              />
-              <Bar
-                yAxisId="left"
-                dataKey="delay"
-                stackId="s"
-                name="Delay"
-                fill="#ef4444"
-                cursor="pointer"
-                onClick={(d: DeliveredMonthDatum) => d?.month && onDrillMonth(d.month)}
-              />
-              {totals.unknown > 0 && (
-                <Bar
-                  yAxisId="left"
-                  dataKey="unknown"
-                  stackId="s"
-                  name="No date"
-                  fill="#94a3b8"
-                  cursor="pointer"
-                  onClick={(d: DeliveredMonthDatum) => d?.month && onDrillMonth(d.month)}
-                />
-              )}
-              <Line
-                yAxisId="right"
-                type="monotone"
-                dataKey="cumulativePct"
-                name="Cumulative %"
-                stroke="#f59e0b"
-                strokeWidth={2}
-                dot={{ r: 3 }}
-              />
-            </ComposedChart>
+              <Pie
+                data={data as unknown as Array<{ name: string; value: number; color: string; key: string }>}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={100}
+                dataKey="value"
+                nameKey="name"
+                label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
+                labelLine
+              >
+                {data.map((entry) => (
+                  <Cell
+                    key={entry.key}
+                    fill={entry.color}
+                    onDoubleClick={() => onDrill?.(entry.key as "ontime" | "delay" | "unknown")}
+                    style={{ cursor: onDrill ? "pointer" : "default" }}
+                  />
+                ))}
+              </Pie>
+            </PieChart>
           </ResponsiveContainer>
         </div>
       )}
