@@ -429,10 +429,13 @@ function Dashboard() {
           <StatusPieChart rows={filtered} onDrill={setDrillStatus} />
         </div>
 
-        {/* Delivered Shipment (On-time vs Delay) — per Shipment month */}
+        {/* Delivered Shipment — On-time vs Delay (donut, aggregated by year) */}
         <DeliveredShipmentChart
-          data={deliveredByMonth}
-          onDrillMonth={(m) => setDeliveredMonth(m)}
+          rows={deliveredRows}
+          onDrill={(status) => {
+            setDeliveredFilter(status);
+            setShowDelivered(true);
+          }}
         />
 
         {/* Customer Feedback Chart */}
