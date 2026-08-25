@@ -14,6 +14,9 @@ export interface NpiRow {
   YearMonth: string; // normalized "YYYY-MM"
   Status: string;
   Delivery: string;
+  Start: string; // YYYY-MM-DD or raw text
+  Request: string;
+  Plan: string; // YYYY-MM-DD or raw text
   CustomerFeedback: string;
   EstimateShipment: string;
   Shipment: string;
@@ -101,6 +104,9 @@ export const getNpiData = createServerFn({ method: "GET" }).handler(
       YearMonth: normalizeYearMonth(r.YearMonth),
       Status: clean(r.Status),
       Delivery: clean(r.Delivery),
+      Start: formatDate(r.Start),
+      Request: String(r.Request ?? "").trim(),
+      Plan: formatDate(r.Plan),
       CustomerFeedback: String(r["Customer feedback"] ?? r.CustomerFeedback ?? "").trim(),
       EstimateShipment: formatDate(r["Estimate Shipment"] ?? r.EstimateShipment),
       Shipment: formatDate(r["Shipment"] ?? r.Shipment),

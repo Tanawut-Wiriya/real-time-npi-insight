@@ -607,18 +607,21 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
     { key: "Description", label: "Description" },
     { key: "Quantity", label: "QTY." },
     { key: "YearMonth", label: "START DATE" },
+    { key: "Start", label: "Start" },
+    { key: "Request", label: "Request" },
     { key: "Status", label: "STATUS" },
-    { key: "Delivery", label: "Delivery" },
-    { key: "EstimateShipment", label: "Estimate Shipment" },
+    { key: "Delivery", label: "DELIVERY" },
+    { key: "Plan", label: "Plan" },
     { key: "Shipment", label: "Shipment" },
-    { key: "CustomerFeedback", label: "Customer Feedback" },
+    { key: "EstimateShipment", label: "Commit" },
+    { key: "CustomerFeedback", label: "Feedback" },
   ];
 
   return (
     <Card className="overflow-hidden p-0">
       <div className="flex items-center justify-between border-b px-5 py-4">
         <div>
-          <h2 className="text-lg font-semibold">Filtered Records</h2>
+          <h2 className="text-lg font-semibold">Projects List</h2>
           <p className="text-xs text-muted-foreground">
             {rows.length.toLocaleString()} รายการ
           </p>
@@ -671,14 +674,19 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
                       {r.Quantity.toLocaleString()}
                     </TableCell>
                     <TableCell className="whitespace-nowrap">{r.YearMonth}</TableCell>
+                    <TableCell className="whitespace-nowrap text-xs">{r.Start}</TableCell>
+                    <TableCell className="max-w-[180px] truncate text-xs" title={r.Request}>
+                      {r.Request || "-"}
+                    </TableCell>
                     <TableCell>
                       <StatusBadge value={r.Status} />
                     </TableCell>
                     <TableCell>
                       <DeliveryBadge value={r.Delivery} />
                     </TableCell>
-                    <TableCell className="whitespace-nowrap text-xs">{r.EstimateShipment}</TableCell>
+                    <TableCell className="whitespace-nowrap text-xs">{r.Plan}</TableCell>
                     <TableCell className="whitespace-nowrap text-xs">{r.Shipment}</TableCell>
+                    <TableCell className="whitespace-nowrap text-xs">{r.EstimateShipment}</TableCell>
                     <TableCell className="max-w-[240px] truncate text-xs" title={r.CustomerFeedback}>
                       {r.CustomerFeedback || "-"}
                     </TableCell>
