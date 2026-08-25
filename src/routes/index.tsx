@@ -607,11 +607,14 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
     { key: "Description", label: "Description" },
     { key: "Quantity", label: "QTY." },
     { key: "YearMonth", label: "START DATE" },
+    { key: "Start", label: "Start" },
+    { key: "Request", label: "Request" },
     { key: "Status", label: "STATUS" },
-    { key: "Delivery", label: "Delivery" },
-    { key: "EstimateShipment", label: "Estimate Shipment" },
+    { key: "Delivery", label: "DELIVERY" },
+    { key: "Plan", label: "Plan" },
     { key: "Shipment", label: "Shipment" },
-    { key: "CustomerFeedback", label: "Customer Feedback" },
+    { key: "EstimateShipment", label: "Commit" },
+    { key: "CustomerFeedback", label: "Feedback" },
   ];
 
   return (
