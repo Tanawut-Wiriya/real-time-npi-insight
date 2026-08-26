@@ -104,9 +104,10 @@ export const getNpiData = createServerFn({ method: "GET" }).handler(
       YearMonth: normalizeYearMonth(r.YearMonth),
       Status: clean(r.Status),
       Delivery: clean(r.Delivery),
-      Start: formatDate(r.Start),
-      Request: String(r.Request ?? "").trim(),
-      Plan: formatDate(r.Plan),
+      // Columns N, O, P from the source sheet
+      Start: formatDate(r["started date"] ?? r.Start),
+      Request: String(r["requested date"] ?? r.Request ?? "").trim(),
+      Plan: formatDate(r["production plan"] ?? r.Plan),
       CustomerFeedback: String(r["Customer feedback"] ?? r.CustomerFeedback ?? "").trim(),
       EstimateShipment: formatDate(r["Estimate Shipment"] ?? r.EstimateShipment),
       Shipment: formatDate(r["Shipment"] ?? r.Shipment),
