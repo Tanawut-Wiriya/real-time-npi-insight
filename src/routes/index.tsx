@@ -61,6 +61,22 @@ const asmlQuery = queryOptions({
 });
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Product NPI Analytics Dashboard" },
+      {
+        name: "description",
+        content: "Real-time dashboard for Product NPI and ASML project analytics.",
+      },
+      { property: "og:title", content: "Product NPI Analytics Dashboard" },
+      {
+        property: "og:description",
+        content: "Real-time dashboard for Product NPI and ASML project analytics.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: DashboardPage,
 });
 
