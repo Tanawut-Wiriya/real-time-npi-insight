@@ -97,25 +97,38 @@ async function fetchAll(): Promise<{ rawData: RawRow[]; asmlRawData: RawRow[] }>
   };
 }
 
+function pick(r: RawRow, ...keys: string[]): unknown {
+  for (const k of keys) {
+    if (r[k] !== undefined && r[k] !== null && r[k] !== "") return r[k];
+  }
+  return undefined;
+}
+
 export async function fetchNpiData(): Promise<NpiRow[]> {
   const { rawData } = await fetchAll();
   return rawData.map((r) => ({
-    No: Number(r.No) || 0,
-    Product: String(r.Product ?? ""),
-    Country: String(r.Country ?? ""),
-    Article: (r.Article as string | number) ?? "",
-    Description: String(r.Description ?? ""),
-    Quantity: Number(r.Quantity) || 0,
-    Year: Number(r.Year) || 0,
-    YearMonth: normalizeYearMonth(r.YearMonth),
-    Status: clean(r.Status),
-    Delivery: clean(r.Delivery),
-    Start: formatDate(r["Started date"] ?? r["started date"] ?? r.Start),
-    Request: String(r["Requested date"] ?? r["requested date"] ?? r.Request ?? "").trim(),
-    Plan: formatDate(r["Production plan"] ?? r["production plan"] ?? r.Plan),
-    CustomerFeedback: String(r["Customer feedback"] ?? r.CustomerFeedback ?? "").trim(),
-    EstimateShipment: formatDate(r["Estimate Shipment"] ?? r.EstimateShipment),
-    Shipment: formatDate(r.Shipment),
+    No: Number(pick(r, "No", "no")) || 0,
+    Product: String(pick(r, "Product", "product") ?? ""),
+    Country: String(pick(r, "Country", "country") ?? ""),
+    Article: (pick(r, "Article", "article") as string | number) ?? "",
+    Description: String(pick(r, "Description", "description") ?? ""),
+    Quantity: Number(pick(r, "Quantity", "quantity")) || 0,
+    Year: Number(pick(r, "Year", "year")) || 0,
+    YearMonth: normalizeYearMonth(pick(r, "YearMonth", "yearMonth")),
+    Status: clean(pick(r, "Status", "status")),
+    Delivery: clean(pick(r, "Delivery", "delivery")),
+    Start: formatDate(pick(r, "Started date", "started date", "Start", "startedDate")),
+    Request: String(
+      pick(r, "Requested date", "requested date", "Request", "requestedDate") ?? "",
+    ).trim(),
+    Plan: formatDate(pick(r, "Production plan", "production plan", "Plan", "productionPlan")),
+    CustomerFeedback: String(
+      pick(r, "Customer feedback", "CustomerFeedback", "customerFeedback") ?? "",
+    ).trim(),
+    EstimateShipment: formatDate(
+      pick(r, "Estimate Shipment", "EstimateShipment", "estimateShipment"),
+    ),
+    Shipment: formatDate(pick(r, "Shipment", "shipment")),
   }));
 }
 
