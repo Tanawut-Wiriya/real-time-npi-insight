@@ -1,7 +1,7 @@
 import type { AsmlRow, NpiRow } from "./npi.types";
 
 const DATA_URL =
-  "https://script.google.com/macros/s/AKfycbzvmHETMFLENY7HtHeLH6pP2uv0Q4YV51n6jfpi7IZW_8kEAuKo2iuEV40vTJvUryygFQ/exec";
+  "https://script.google.com/macros/s/AKfycbwuQCRSkSzCm1JwixbYbJOQNAWRudA1CgI_vQGeA20VdoOFAwXnesyaoui6zG88n7P5gA/exec";
 const TZ_OFFSET_MS = 7 * 60 * 60 * 1000;
 
 type RawRow = Record<string, unknown>;
