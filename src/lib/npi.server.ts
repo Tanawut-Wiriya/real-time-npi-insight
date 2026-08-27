@@ -140,7 +140,7 @@ function planYearMonth(date: string): string {
 export async function fetchAsmlData(): Promise<AsmlRow[]> {
   const { asmlRawData } = await fetchAll();
   return asmlRawData.map((r) => {
-    const rawPlan = r.Plan;
+    const rawPlan = pick(r, "Plan", "plan");
     let plan = "";
     let yearMonth = "";
     if (
@@ -154,16 +154,16 @@ export async function fetchAsmlData(): Promise<AsmlRow[]> {
       yearMonth = plan;
     }
     return {
-      No: Number(r.No) || 0,
-      Product: String(r.Product ?? ""),
-      Description: String(r.Description ?? ""),
-      Article: (r.Article as string | number) ?? "",
-      Status: clean(r.Status),
+      No: Number(pick(r, "No", "no")) || 0,
+      Product: String(pick(r, "Product", "product") ?? ""),
+      Description: String(pick(r, "Description", "description") ?? ""),
+      Article: (pick(r, "Article", "article") as string | number) ?? "",
+      Status: clean(pick(r, "Status", "status")),
       Plan: plan,
       PlanYearMonth: yearMonth,
       PlanYear: yearMonth && /^\d{4}/.test(yearMonth) ? Number(yearMonth.slice(0, 4)) : 0,
-      Quantity: Number(r.Quantity) || 0,
-      Remark: String(r.Remark ?? "").trim(),
+      Quantity: Number(pick(r, "Quantity", "quantity")) || 0,
+      Remark: String(pick(r, "Remark", "remark") ?? "").trim(),
     };
   });
 }
