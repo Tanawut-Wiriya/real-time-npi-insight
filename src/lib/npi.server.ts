@@ -1,7 +1,7 @@
 import type { AsmlRow, NpiRow } from "./npi.types";
 
 const DATA_URL =
-  "https://script.google.com/macros/s/AKfycbzvmHETMFLENY7HtHeLH6pP2uv0Q4YV51n6jfpi7IZW_8kEAuKo2iuEV40vTJvUryygFQ/exec";
+  "https://script.google.com/macros/s/AKfycbwuQCRSkSzCm1JwixbYbJOQNAWRudA1CgI_vQGeA20VdoOFAwXnesyaoui6zG88n7P5gA/exec";
 const TZ_OFFSET_MS = 7 * 60 * 60 * 1000;
 
 type RawRow = Record<string, unknown>;
@@ -97,25 +97,38 @@ async function fetchAll(): Promise<{ rawData: RawRow[]; asmlRawData: RawRow[] }>
   };
 }
 
+function pick(r: RawRow, ...keys: string[]): unknown {
+  for (const k of keys) {
+    if (r[k] !== undefined && r[k] !== null && r[k] !== "") return r[k];
+  }
+  return undefined;
+}
+
 export async function fetchNpiData(): Promise<NpiRow[]> {
   const { rawData } = await fetchAll();
   return rawData.map((r) => ({
-    No: Number(r.No) || 0,
-    Product: String(r.Product ?? ""),
-    Country: String(r.Country ?? ""),
-    Article: (r.Article as string | number) ?? "",
-    Description: String(r.Description ?? ""),
-    Quantity: Number(r.Quantity) || 0,
-    Year: Number(r.Year) || 0,
-    YearMonth: normalizeYearMonth(r.YearMonth),
-    Status: clean(r.Status),
-    Delivery: clean(r.Delivery),
-    Start: formatDate(r["Started date"] ?? r["started date"] ?? r.Start),
-    Request: String(r["Requested date"] ?? r["requested date"] ?? r.Request ?? "").trim(),
-    Plan: formatDate(r["Production plan"] ?? r["production plan"] ?? r.Plan),
-    CustomerFeedback: String(r["Customer feedback"] ?? r.CustomerFeedback ?? "").trim(),
-    EstimateShipment: formatDate(r["Estimate Shipment"] ?? r.EstimateShipment),
-    Shipment: formatDate(r.Shipment),
+    No: Number(pick(r, "No", "no")) || 0,
+    Product: String(pick(r, "Product", "product") ?? ""),
+    Country: String(pick(r, "Country", "country") ?? ""),
+    Article: (pick(r, "Article", "article") as string | number) ?? "",
+    Description: String(pick(r, "Description", "description") ?? ""),
+    Quantity: Number(pick(r, "Quantity", "quantity")) || 0,
+    Year: Number(pick(r, "Year", "year")) || 0,
+    YearMonth: normalizeYearMonth(pick(r, "YearMonth", "yearMonth")),
+    Status: clean(pick(r, "Status", "status")),
+    Delivery: clean(pick(r, "Delivery", "delivery")),
+    Start: formatDate(pick(r, "Started date", "started date", "Start", "startedDate")),
+    Request: String(
+      pick(r, "Requested date", "requested date", "Request", "requestedDate") ?? "",
+    ).trim(),
+    Plan: formatDate(pick(r, "Production plan", "production plan", "Plan", "productionPlan")),
+    CustomerFeedback: String(
+      pick(r, "Customer feedback", "CustomerFeedback", "customerFeedback") ?? "",
+    ).trim(),
+    EstimateShipment: formatDate(
+      pick(r, "Estimate Shipment", "EstimateShipment", "estimateShipment"),
+    ),
+    Shipment: formatDate(pick(r, "Shipment", "shipment")),
   }));
 }
 
@@ -127,7 +140,7 @@ function planYearMonth(date: string): string {
 export async function fetchAsmlData(): Promise<AsmlRow[]> {
   const { asmlRawData } = await fetchAll();
   return asmlRawData.map((r) => {
-    const rawPlan = r.Plan;
+    const rawPlan = pick(r, "Plan", "plan");
     let plan = "";
     let yearMonth = "";
     if (
@@ -141,16 +154,16 @@ export async function fetchAsmlData(): Promise<AsmlRow[]> {
       yearMonth = plan;
     }
     return {
-      No: Number(r.No) || 0,
-      Product: String(r.Product ?? ""),
-      Description: String(r.Description ?? ""),
-      Article: (r.Article as string | number) ?? "",
-      Status: clean(r.Status),
+      No: Number(pick(r, "No", "no")) || 0,
+      Product: String(pick(r, "Product", "product") ?? ""),
+      Description: String(pick(r, "Description", "description") ?? ""),
+      Article: (pick(r, "Article", "article") as string | number) ?? "",
+      Status: clean(pick(r, "Status", "status")),
       Plan: plan,
       PlanYearMonth: yearMonth,
       PlanYear: yearMonth && /^\d{4}/.test(yearMonth) ? Number(yearMonth.slice(0, 4)) : 0,
-      Quantity: Number(r.Quantity) || 0,
-      Remark: String(r.Remark ?? "").trim(),
+      Quantity: Number(pick(r, "Quantity", "quantity")) || 0,
+      Remark: String(pick(r, "Remark", "remark") ?? "").trim(),
     };
   });
 }
