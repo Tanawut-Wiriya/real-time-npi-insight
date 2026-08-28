@@ -628,9 +628,10 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
     { key: "Status", label: "STATUS" },
     { key: "Delivery", label: "DELIVERY" },
     { key: "Plan", label: "Plan" },
-    { key: "Shipment", label: "Shipment" },
     { key: "EstimateShipment", label: "Commit" },
+    { key: "Shipment", label: "Shipment" },
     { key: "CustomerFeedback", label: "Feedback" },
+    { key: "Remark", label: "Remark" },
   ];
 
   return (
@@ -701,10 +702,13 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
                       <DeliveryBadge value={r.Delivery} />
                     </TableCell>
                     <TableCell className="whitespace-nowrap text-xs">{r.Plan}</TableCell>
-                    <TableCell className="whitespace-nowrap text-xs">{r.Shipment}</TableCell>
                     <TableCell className="whitespace-nowrap text-xs">{r.EstimateShipment}</TableCell>
+                    <TableCell className="whitespace-nowrap text-xs">{r.Shipment}</TableCell>
                     <TableCell className="max-w-[240px] truncate text-xs" title={r.CustomerFeedback}>
                       {r.CustomerFeedback || "-"}
+                    </TableCell>
+                    <TableCell className="max-w-[240px] truncate text-xs" title={r.Remark}>
+                      {r.Remark || "-"}
                     </TableCell>
                   </TableRow>
                 ))}
