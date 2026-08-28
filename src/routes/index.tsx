@@ -215,6 +215,17 @@ function Dashboard() {
     [filtered],
   );
 
+  // Totals across the whole dataset (ignoring filters)
+  const totalProjectsAll = rows.length;
+  const totalDeliveredAll = useMemo(
+    () => rows.filter((r) => /deliver/i.test(r.Status)).length,
+    [rows],
+  );
+  const totalInProgressAll = useMemo(
+    () => rows.filter((r) => /in production|in progress/i.test(r.Status)).length,
+    [rows],
+  );
+
   const deliveredRows = useMemo(
     () => filtered.filter((r) => /deliver/i.test(r.Status)),
     [filtered],
