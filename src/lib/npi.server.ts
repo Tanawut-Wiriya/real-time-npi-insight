@@ -125,6 +125,7 @@ export async function fetchNpiData(): Promise<NpiRow[]> {
     CustomerFeedback: String(
       pick(r, "Customer feedback", "CustomerFeedback", "customerFeedback") ?? "",
     ).trim(),
+    Remark: String(pick(r, "Remark", "remark") ?? "").trim(),
     EstimateShipment: formatDate(
       pick(r, "Estimate Shipment", "EstimateShipment", "estimateShipment"),
     ),

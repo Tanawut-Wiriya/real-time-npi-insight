@@ -13,6 +13,7 @@ export interface NpiRow {
   Request: string;
   Plan: string;
   CustomerFeedback: string;
+  Remark: string;
   EstimateShipment: string;
   Shipment: string;
 }
