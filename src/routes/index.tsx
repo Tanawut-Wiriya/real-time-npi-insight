@@ -215,14 +215,37 @@ function Dashboard() {
     [filtered],
   );
 
-  // Totals across the whole dataset (ignoring filters)
-  const totalProjectsAll = rows.length;
-  const totalDeliveredAll = useMemo(
-    () => rows.filter((r) => /deliver/i.test(r.Status)).length,
+  // Quantity sums for the filtered selection
+  const totalProjectsQty = totalQty;
+  const deliveredQty = useMemo(
+    () =>
+      filtered
+        .filter((r) => /deliver/i.test(r.Status))
+        .reduce((s, r) => s + r.Quantity, 0),
+    [filtered],
+  );
+  const inProgressQty = useMemo(
+    () =>
+      filtered
+        .filter((r) => /in production|in progress/i.test(r.Status))
+        .reduce((s, r) => s + r.Quantity, 0),
+    [filtered],
+  );
+
+  // Quantity totals across the whole dataset (ignoring filters)
+  const totalProjectsQtyAll = rows.reduce((s, r) => s + r.Quantity, 0);
+  const totalDeliveredQtyAll = useMemo(
+    () =>
+      rows
+        .filter((r) => /deliver/i.test(r.Status))
+        .reduce((s, r) => s + r.Quantity, 0),
     [rows],
   );
-  const totalInProgressAll = useMemo(
-    () => rows.filter((r) => /in production|in progress/i.test(r.Status)).length,
+  const totalInProgressQtyAll = useMemo(
+    () =>
+      rows
+        .filter((r) => /in production|in progress/i.test(r.Status))
+        .reduce((s, r) => s + r.Quantity, 0),
     [rows],
   );
 
@@ -349,8 +372,8 @@ function Dashboard() {
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <KpiCard
             label="Total Projects"
-            value={filtered.length.toLocaleString()}
-            subValue={`Total: ${totalProjectsAll.toLocaleString()}`}
+            value={totalProjectsQty.toLocaleString()}
+            subValue={`Total QTY: ${totalProjectsQtyAll.toLocaleString()}`}
             icon={<Package className="h-4 w-4" />}
             onClick={() => setShowTotal(true)}
           />
@@ -361,8 +384,8 @@ function Dashboard() {
           />
           <KpiCard
             label="Delivered"
-            value={delivered.toLocaleString()}
-            subValue={`Total: ${totalDeliveredAll.toLocaleString()}`}
+            value={deliveredQty.toLocaleString()}
+            subValue={`Total QTY: ${totalDeliveredQtyAll.toLocaleString()}`}
             icon={<Truck className="h-4 w-4" />}
             onClick={() => {
               setDeliveredFilter("all");
@@ -371,8 +394,8 @@ function Dashboard() {
           />
           <KpiCard
             label="In progress"
-            value={inProgress.toLocaleString()}
-            subValue={`Total: ${totalInProgressAll.toLocaleString()}`}
+            value={inProgressQty.toLocaleString()}
+            subValue={`Total QTY: ${totalInProgressQtyAll.toLocaleString()}`}
             icon={<LineIcon className="h-4 w-4" />}
             onClick={() => setShowInProgress(true)}
           />
