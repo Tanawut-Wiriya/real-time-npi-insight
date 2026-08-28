@@ -372,8 +372,8 @@ function Dashboard() {
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <KpiCard
             label="Total Projects"
-            value={filtered.length.toLocaleString()}
-            subValue={`Total: ${totalProjectsAll.toLocaleString()}`}
+            value={totalProjectsQty.toLocaleString()}
+            subValue={`Total QTY: ${totalProjectsQtyAll.toLocaleString()}`}
             icon={<Package className="h-4 w-4" />}
             onClick={() => setShowTotal(true)}
           />
@@ -384,8 +384,8 @@ function Dashboard() {
           />
           <KpiCard
             label="Delivered"
-            value={delivered.toLocaleString()}
-            subValue={`Total: ${totalDeliveredAll.toLocaleString()}`}
+            value={deliveredQty.toLocaleString()}
+            subValue={`Total QTY: ${totalDeliveredQtyAll.toLocaleString()}`}
             icon={<Truck className="h-4 w-4" />}
             onClick={() => {
               setDeliveredFilter("all");
@@ -394,8 +394,8 @@ function Dashboard() {
           />
           <KpiCard
             label="In progress"
-            value={inProgress.toLocaleString()}
-            subValue={`Total: ${totalInProgressAll.toLocaleString()}`}
+            value={inProgressQty.toLocaleString()}
+            subValue={`Total QTY: ${totalInProgressQtyAll.toLocaleString()}`}
             icon={<LineIcon className="h-4 w-4" />}
             onClick={() => setShowInProgress(true)}
           />
