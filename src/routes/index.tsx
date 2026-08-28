@@ -215,14 +215,37 @@ function Dashboard() {
     [filtered],
   );
 
-  // Totals across the whole dataset (ignoring filters)
-  const totalProjectsAll = rows.length;
-  const totalDeliveredAll = useMemo(
-    () => rows.filter((r) => /deliver/i.test(r.Status)).length,
+  // Quantity sums for the filtered selection
+  const totalProjectsQty = totalQty;
+  const deliveredQty = useMemo(
+    () =>
+      filtered
+        .filter((r) => /deliver/i.test(r.Status))
+        .reduce((s, r) => s + r.Quantity, 0),
+    [filtered],
+  );
+  const inProgressQty = useMemo(
+    () =>
+      filtered
+        .filter((r) => /in production|in progress/i.test(r.Status))
+        .reduce((s, r) => s + r.Quantity, 0),
+    [filtered],
+  );
+
+  // Quantity totals across the whole dataset (ignoring filters)
+  const totalProjectsQtyAll = rows.reduce((s, r) => s + r.Quantity, 0);
+  const totalDeliveredQtyAll = useMemo(
+    () =>
+      rows
+        .filter((r) => /deliver/i.test(r.Status))
+        .reduce((s, r) => s + r.Quantity, 0),
     [rows],
   );
-  const totalInProgressAll = useMemo(
-    () => rows.filter((r) => /in production|in progress/i.test(r.Status)).length,
+  const totalInProgressQtyAll = useMemo(
+    () =>
+      rows
+        .filter((r) => /in production|in progress/i.test(r.Status))
+        .reduce((s, r) => s + r.Quantity, 0),
     [rows],
   );
 
