@@ -202,18 +202,7 @@ function Dashboard() {
     );
   }, [filtered]);
 
-  const totalQty = filtered.reduce((s, r) => s + r.Quantity, 0);
-  const delivered = useMemo(
-    () => filtered.filter((r) => /deliver/i.test(r.Status)).length,
-    [filtered],
-  );
-  const inProgress = filtered.filter(
-    (r) => /in production|in progress/i.test(r.Status),
-  ).length;
-  const inProgressRows = useMemo(
-    () => filtered.filter((r) => /in production|in progress/i.test(r.Status)),
-    [filtered],
-  );
+const totalQty = filtered.reduce((s, r) => s + r.Quantity, 0);
 
 // Rows for the selected year (used by the Total Projects / Delivered / In progress KPIs)
   const yearRows = useMemo(
@@ -222,30 +211,25 @@ function Dashboard() {
     [rows, year],
   );
 
-  // Total Projects: count of rows for the selected year + their total quantity
+// Total Projects: count of rows for the selected year + their total quantity
   const totalProjectsCount = yearRows.length;
   const totalProjectsQty = yearRows.reduce((s, r) => s + r.Quantity, 0);
 
   // Delivered: rows for the selected year with Status "Delivered"
-  const deliveredYearRows = useMemo(
+  const deliveredRows = useMemo(
     () => yearRows.filter((r) => /^delivered$/i.test(r.Status.trim())),
     [yearRows],
   );
-  const deliveredCount = deliveredYearRows.length;
-  const deliveredQty = deliveredYearRows.reduce((s, r) => s + r.Quantity, 0);
+  const deliveredCount = deliveredRows.length;
+  const deliveredQty = deliveredRows.reduce((s, r) => s + r.Quantity, 0);
 
   // In progress: rows for the selected year with Status "In progress"
-  const inProgressYearRows = useMemo(
+  const inProgressRows = useMemo(
     () => yearRows.filter((r) => /^in progress$/i.test(r.Status.trim())),
     [yearRows],
   );
-  const inProgressCount = inProgressYearRows.length;
-  const inProgressQty = inProgressYearRows.reduce((s, r) => s + r.Quantity, 0);
-
-  const deliveredRows = useMemo(
-    () => filtered.filter((r) => /deliver/i.test(r.Status)),
-    [filtered],
-  );
+  const inProgressCount = inProgressRows.length;
+  const inProgressQty = inProgressRows.reduce((s, r) => s + r.Quantity, 0);
 
   const deliveredShipment = useMemo(() => {
     let onTime = 0;
@@ -363,10 +347,10 @@ function Dashboard() {
 
         {/* KPIs */}
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <KpiCard
+<KpiCard
             label="Total Projects"
-            value={totalProjectsQty.toLocaleString()}
-            subValue={`Total QTY: ${totalProjectsQtyAll.toLocaleString()}`}
+            value={totalProjectsCount.toLocaleString()}
+            subValue={`Total QTY: ${totalProjectsQty.toLocaleString()}`}
             icon={<Package className="h-4 w-4" />}
             onClick={() => setShowTotal(true)}
           />
@@ -377,8 +361,8 @@ function Dashboard() {
           />
           <KpiCard
             label="Delivered"
-            value={deliveredQty.toLocaleString()}
-            subValue={`Total QTY: ${totalDeliveredQtyAll.toLocaleString()}`}
+            value={deliveredCount.toLocaleString()}
+            subValue={`Total QTY: ${deliveredQty.toLocaleString()}`}
             icon={<Truck className="h-4 w-4" />}
             onClick={() => {
               setDeliveredFilter("all");
@@ -387,8 +371,8 @@ function Dashboard() {
           />
           <KpiCard
             label="In progress"
-            value={inProgressQty.toLocaleString()}
-            subValue={`Total QTY: ${totalInProgressQtyAll.toLocaleString()}`}
+            value={inProgressCount.toLocaleString()}
+            subValue={`Total QTY: ${inProgressQty.toLocaleString()}`}
             icon={<LineIcon className="h-4 w-4" />}
             onClick={() => setShowInProgress(true)}
           />
@@ -501,10 +485,10 @@ function Dashboard() {
         />
       )}
 
-      {showTotal && (
+{showTotal && (
         <StatusDrilldownModal
           status="Total Projects"
-          rows={filtered}
+          rows={yearRows}
           onClose={() => setShowTotal(false)}
         />
       )}
