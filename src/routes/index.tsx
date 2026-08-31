@@ -577,6 +577,7 @@ function KpiCard({
   value: string;
   icon: React.ReactNode;
   subValue?: string;
+  revenue?: number;
   onClick?: () => void;
 }) {
   return (
