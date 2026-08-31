@@ -16,6 +16,7 @@ export interface NpiRow {
   Remark: string;
   EstimateShipment: string;
   Shipment: string;
+  Revenue: number;
 }
 
 export interface AsmlRow {

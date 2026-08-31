@@ -21,12 +21,13 @@ import {
   ArrowUp,
   ArrowUpDown,
   BarChart3,
+  Factory,
   Inbox,
-  LineChart as LineIcon,
   Loader2,
   Package,
   RefreshCw,
   Truck,
+  Wrench,
 } from "lucide-react";
 import { getNpiData, getAsmlData, type NpiRow, type AsmlRow } from "@/lib/npi.functions";
 import {
@@ -230,6 +231,20 @@ const totalQty = filtered.reduce((s, r) => s + r.Quantity, 0);
   );
   const inProgressCount = inProgressRows.length;
   const inProgressQty = inProgressRows.reduce((s, r) => s + r.Quantity, 0);
+
+  // In production: rows for the selected year with Status "In production"
+  const inProductionRows = useMemo(
+    () => yearRows.filter((r) => /^in ?production$/i.test(r.Status.trim())),
+    [yearRows],
+  );
+  const inProductionCount = inProductionRows.length;
+  const inProductionQty = inProductionRows.reduce((s, r) => s + r.Quantity, 0);
+
+  // Revenue sums (same scope as the quantity sums above)
+  const totalProjectsRevenue = yearRows.reduce((s, r) => s + r.Revenue, 0);
+  const deliveredRevenue = deliveredRows.reduce((s, r) => s + r.Revenue, 0);
+  const inProgressRevenue = inProgressRows.reduce((s, r) => s + r.Revenue, 0);
+  const inProductionRevenue = inProductionRows.reduce((s, r) => s + r.Revenue, 0);
 
   const deliveredShipment = useMemo(() => {
     let onTime = 0;
@@ -556,12 +571,14 @@ function KpiCard({
   value,
   icon,
   subValue,
+  revenue,
   onClick,
 }: {
   label: string;
   value: string;
   icon: React.ReactNode;
   subValue?: string;
+  revenue?: number;
   onClick?: () => void;
 }) {
   return (
@@ -584,7 +601,19 @@ function KpiCard({
         </span>
         <span className="rounded-md bg-secondary p-1.5 text-primary">{icon}</span>
       </div>
-      <div className="mt-2 text-2xl font-semibold tracking-tight">{value}</div>
+      <div className="mt-2 flex items-end justify-between gap-2">
+        <div className="text-2xl font-semibold tracking-tight">{value}</div>
+        {revenue !== undefined && (
+          <div className="text-right">
+            <div className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+              Revenue
+            </div>
+            <div className="text-sm font-semibold tabular-nums text-primary">
+              {revenue.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+            </div>
+          </div>
+        )}
+      </div>
       {subValue && (
         <div className="mt-1 text-xs text-muted-foreground">{subValue}</div>
       )}
