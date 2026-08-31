@@ -202,18 +202,7 @@ function Dashboard() {
     );
   }, [filtered]);
 
-  const totalQty = filtered.reduce((s, r) => s + r.Quantity, 0);
-  const delivered = useMemo(
-    () => filtered.filter((r) => /deliver/i.test(r.Status)).length,
-    [filtered],
-  );
-  const inProgress = filtered.filter(
-    (r) => /in production|in progress/i.test(r.Status),
-  ).length;
-  const inProgressRows = useMemo(
-    () => filtered.filter((r) => /in production|in progress/i.test(r.Status)),
-    [filtered],
-  );
+const totalQty = filtered.reduce((s, r) => s + r.Quantity, 0);
 
 // Rows for the selected year (used by the Total Projects / Delivered / In progress KPIs)
   const yearRows = useMemo(
