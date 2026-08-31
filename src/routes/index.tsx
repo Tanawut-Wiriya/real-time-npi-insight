@@ -363,10 +363,10 @@ function Dashboard() {
 
         {/* KPIs */}
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <KpiCard
+<KpiCard
             label="Total Projects"
-            value={totalProjectsQty.toLocaleString()}
-            subValue={`Total QTY: ${totalProjectsQtyAll.toLocaleString()}`}
+            value={totalProjectsCount.toLocaleString()}
+            subValue={`Total QTY: ${totalProjectsQty.toLocaleString()}`}
             icon={<Package className="h-4 w-4" />}
             onClick={() => setShowTotal(true)}
           />
@@ -377,8 +377,8 @@ function Dashboard() {
           />
           <KpiCard
             label="Delivered"
-            value={deliveredQty.toLocaleString()}
-            subValue={`Total QTY: ${totalDeliveredQtyAll.toLocaleString()}`}
+            value={deliveredCount.toLocaleString()}
+            subValue={`Total QTY: ${deliveredQty.toLocaleString()}`}
             icon={<Truck className="h-4 w-4" />}
             onClick={() => {
               setDeliveredFilter("all");
@@ -387,8 +387,8 @@ function Dashboard() {
           />
           <KpiCard
             label="In progress"
-            value={inProgressQty.toLocaleString()}
-            subValue={`Total QTY: ${totalInProgressQtyAll.toLocaleString()}`}
+            value={inProgressCount.toLocaleString()}
+            subValue={`Total QTY: ${inProgressQty.toLocaleString()}`}
             icon={<LineIcon className="h-4 w-4" />}
             onClick={() => setShowInProgress(true)}
           />
