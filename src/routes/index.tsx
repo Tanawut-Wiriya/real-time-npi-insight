@@ -21,12 +21,13 @@ import {
   ArrowUp,
   ArrowUpDown,
   BarChart3,
+  Factory,
   Inbox,
-  LineChart as LineIcon,
   Loader2,
   Package,
   RefreshCw,
   Truck,
+  Wrench,
 } from "lucide-react";
 import { getNpiData, getAsmlData, type NpiRow, type AsmlRow } from "@/lib/npi.functions";
 import {
@@ -230,6 +231,20 @@ const totalQty = filtered.reduce((s, r) => s + r.Quantity, 0);
   );
   const inProgressCount = inProgressRows.length;
   const inProgressQty = inProgressRows.reduce((s, r) => s + r.Quantity, 0);
+
+  // In production: rows for the selected year with Status "In production"
+  const inProductionRows = useMemo(
+    () => yearRows.filter((r) => /^in ?production$/i.test(r.Status.trim())),
+    [yearRows],
+  );
+  const inProductionCount = inProductionRows.length;
+  const inProductionQty = inProductionRows.reduce((s, r) => s + r.Quantity, 0);
+
+  // Revenue sums (same scope as the quantity sums above)
+  const totalProjectsRevenue = yearRows.reduce((s, r) => s + r.Revenue, 0);
+  const deliveredRevenue = deliveredRows.reduce((s, r) => s + r.Revenue, 0);
+  const inProgressRevenue = inProgressRows.reduce((s, r) => s + r.Revenue, 0);
+  const inProductionRevenue = inProductionRows.reduce((s, r) => s + r.Revenue, 0);
 
   const deliveredShipment = useMemo(() => {
     let onTime = 0;
