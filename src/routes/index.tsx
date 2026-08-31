@@ -211,30 +211,25 @@ const totalQty = filtered.reduce((s, r) => s + r.Quantity, 0);
     [rows, year],
   );
 
-  // Total Projects: count of rows for the selected year + their total quantity
+// Total Projects: count of rows for the selected year + their total quantity
   const totalProjectsCount = yearRows.length;
   const totalProjectsQty = yearRows.reduce((s, r) => s + r.Quantity, 0);
 
   // Delivered: rows for the selected year with Status "Delivered"
-  const deliveredYearRows = useMemo(
+  const deliveredRows = useMemo(
     () => yearRows.filter((r) => /^delivered$/i.test(r.Status.trim())),
     [yearRows],
   );
-  const deliveredCount = deliveredYearRows.length;
-  const deliveredQty = deliveredYearRows.reduce((s, r) => s + r.Quantity, 0);
+  const deliveredCount = deliveredRows.length;
+  const deliveredQty = deliveredRows.reduce((s, r) => s + r.Quantity, 0);
 
   // In progress: rows for the selected year with Status "In progress"
-  const inProgressYearRows = useMemo(
+  const inProgressRows = useMemo(
     () => yearRows.filter((r) => /^in progress$/i.test(r.Status.trim())),
     [yearRows],
   );
-  const inProgressCount = inProgressYearRows.length;
-  const inProgressQty = inProgressYearRows.reduce((s, r) => s + r.Quantity, 0);
-
-  const deliveredRows = useMemo(
-    () => filtered.filter((r) => /deliver/i.test(r.Status)),
-    [filtered],
-  );
+  const inProgressCount = inProgressRows.length;
+  const inProgressQty = inProgressRows.reduce((s, r) => s + r.Quantity, 0);
 
   const deliveredShipment = useMemo(() => {
     let onTime = 0;
