@@ -485,10 +485,10 @@ const totalQty = filtered.reduce((s, r) => s + r.Quantity, 0);
         />
       )}
 
-      {showTotal && (
+{showTotal && (
         <StatusDrilldownModal
           status="Total Projects"
-          rows={filtered}
+          rows={yearRows}
           onClose={() => setShowTotal(false)}
         />
       )}
