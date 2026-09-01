@@ -687,7 +687,7 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
     { key: "Shipment", label: "Shipment" },
     { key: "CustomerFeedback", label: "Feedback" },
     { key: "Remark", label: "Remark" },
-    { key: "Revenue", label: "Revenue", className: "text-right" },
+    { key: "Revenue", label: "Revenue (USD)", className: "text-right" },
   ];
 
   return (
