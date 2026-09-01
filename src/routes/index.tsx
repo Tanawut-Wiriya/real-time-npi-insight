@@ -23,6 +23,7 @@ import {
   BarChart3,
   Factory,
   Inbox,
+  LineChart as LineIcon,
   Loader2,
   Package,
   RefreshCw,
