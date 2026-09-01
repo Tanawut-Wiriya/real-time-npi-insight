@@ -767,7 +767,7 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
                       {r.Remark || "-"}
                     </TableCell>
                     <TableCell className="text-right tabular-nums text-xs">
-                      {r.Revenue.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                      {formatUsd(r.Revenue)}
                     </TableCell>
                   </TableRow>
                 ))}
