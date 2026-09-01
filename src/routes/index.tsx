@@ -23,6 +23,7 @@ import {
   BarChart3,
   Factory,
   Inbox,
+  LineChart as LineIcon,
   Loader2,
   Package,
   RefreshCw,
@@ -203,9 +204,7 @@ function Dashboard() {
     );
   }, [filtered]);
 
-const totalQty = filtered.reduce((s, r) => s + r.Quantity, 0);
-
-// Rows for the selected year (used by the Total Projects / Delivered / In progress KPIs)
+  // Rows for the selected year (used by the Total Projects / Delivered / In progress KPIs)
   const yearRows = useMemo(
     () =>
       year === ALL ? rows : rows.filter((r) => String(r.Year) === year),
@@ -366,18 +365,22 @@ const totalQty = filtered.reduce((s, r) => s + r.Quantity, 0);
             label="Total Projects"
             value={totalProjectsCount.toLocaleString()}
             subValue={`Total QTY: ${totalProjectsQty.toLocaleString()}`}
-            icon={<Package className="h-4 w-4" />}
+            revenue={totalProjectsRevenue}
+            icon={<BarChart3 className="h-4 w-4" />}
             onClick={() => setShowTotal(true)}
           />
           <KpiCard
-            label="Total Quantity"
-            value={totalQty.toLocaleString()}
-            icon={<BarChart3 className="h-4 w-4" />}
+            label="In production"
+            value={inProductionCount.toLocaleString()}
+            subValue={`Total QTY: ${inProductionQty.toLocaleString()}`}
+            revenue={inProductionRevenue}
+            icon={<Factory className="h-4 w-4" />}
           />
           <KpiCard
             label="Delivered"
             value={deliveredCount.toLocaleString()}
             subValue={`Total QTY: ${deliveredQty.toLocaleString()}`}
+            revenue={deliveredRevenue}
             icon={<Truck className="h-4 w-4" />}
             onClick={() => {
               setDeliveredFilter("all");
@@ -388,7 +391,8 @@ const totalQty = filtered.reduce((s, r) => s + r.Quantity, 0);
             label="In progress"
             value={inProgressCount.toLocaleString()}
             subValue={`Total QTY: ${inProgressQty.toLocaleString()}`}
-            icon={<LineIcon className="h-4 w-4" />}
+            revenue={inProgressRevenue}
+            icon={<Wrench className="h-4 w-4" />}
             onClick={() => setShowInProgress(true)}
           />
         </div>
@@ -675,6 +679,7 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
     { key: "Shipment", label: "Shipment" },
     { key: "CustomerFeedback", label: "Feedback" },
     { key: "Remark", label: "Remark" },
+    { key: "Revenue", label: "Revenue", className: "text-right" },
   ];
 
   return (
@@ -752,6 +757,9 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
                     </TableCell>
                     <TableCell className="max-w-[240px] truncate text-xs" title={r.Remark}>
                       {r.Remark || "-"}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums text-xs">
+                      {r.Revenue.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                     </TableCell>
                   </TableRow>
                 ))}
