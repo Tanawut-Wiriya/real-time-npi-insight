@@ -907,7 +907,7 @@ function StatusPieChart({
                 outerRadius={100}
                 dataKey="value"
                 nameKey="name"
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
                 labelLine
                 onDoubleClick={(entry: { name?: string }) => {
                   if (onDrill && entry?.name) onDrill(entry.name);
