@@ -477,7 +477,9 @@ function Dashboard() {
                         }}
                       />
                       <Legend />
-                      <Line type="monotone" dataKey="Count" name="Products" stroke="var(--chart-1)" strokeWidth={2} dot={{ r: 3 }} />
+                      <Line type="monotone" dataKey="Count" name="Projects" stroke="var(--chart-1)" strokeWidth={2} dot={{ r: 3 }}>
+                        <LabelList dataKey="Count" position="top" fontSize={11} fill="var(--foreground)" />
+                      </Line>
                     </LineChart>
                   )}
                 </ResponsiveContainer>
