@@ -1062,7 +1062,7 @@ function FeedbackChart({ rows }: { rows: NpiRow[] }) {
                 outerRadius={120}
                 dataKey="value"
                 nameKey="name"
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
                 labelLine
               >
                 {data.map((_, index) => (
