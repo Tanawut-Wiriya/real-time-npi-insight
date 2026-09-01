@@ -92,6 +92,14 @@ function parseDateStr(s: string): Date | null {
   return isNaN(d.getTime()) ? null : d;
 }
 
+function formatUsd(value: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
 function shipmentStatus(shipment: string, estimate: string): "on-time" | "delay" | "unknown" {
   const s = parseDateStr(shipment);
   const e = parseDateStr(estimate);
@@ -610,10 +618,10 @@ function KpiCard({
         {revenue !== undefined && (
           <div className="text-right">
             <div className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-              Revenue
+              Revenue (USD)
             </div>
             <div className="text-sm font-semibold tabular-nums text-primary">
-              {revenue.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+              {formatUsd(revenue)}
             </div>
           </div>
         )}
@@ -679,7 +687,7 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
     { key: "Shipment", label: "Shipment" },
     { key: "CustomerFeedback", label: "Feedback" },
     { key: "Remark", label: "Remark" },
-    { key: "Revenue", label: "Revenue", className: "text-right" },
+    { key: "Revenue", label: "Revenue (USD)", className: "text-right" },
   ];
 
   return (
@@ -759,7 +767,7 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
                       {r.Remark || "-"}
                     </TableCell>
                     <TableCell className="text-right tabular-nums text-xs">
-                      {r.Revenue.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                      {formatUsd(r.Revenue)}
                     </TableCell>
                   </TableRow>
                 ))}
