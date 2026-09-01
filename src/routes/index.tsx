@@ -6,6 +6,7 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
+  LabelList,
   Legend,
   Line,
   LineChart,
@@ -458,7 +459,9 @@ function Dashboard() {
                         }}
                       />
                       <Legend />
-                      <Bar dataKey="Count" name="Products" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="Count" name="Projects" fill="var(--chart-1)" radius={[4, 4, 0, 0]}>
+                        <LabelList dataKey="Count" position="top" fontSize={11} fill="var(--foreground)" />
+                      </Bar>
                     </BarChart>
                   ) : (
                     <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
@@ -474,7 +477,9 @@ function Dashboard() {
                         }}
                       />
                       <Legend />
-                      <Line type="monotone" dataKey="Count" name="Products" stroke="var(--chart-1)" strokeWidth={2} dot={{ r: 3 }} />
+                      <Line type="monotone" dataKey="Count" name="Projects" stroke="var(--chart-1)" strokeWidth={2} dot={{ r: 3 }}>
+                        <LabelList dataKey="Count" position="top" fontSize={11} fill="var(--foreground)" />
+                      </Line>
                     </LineChart>
                   )}
                 </ResponsiveContainer>
@@ -902,7 +907,7 @@ function StatusPieChart({
                 outerRadius={100}
                 dataKey="value"
                 nameKey="name"
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
                 labelLine
                 onDoubleClick={(entry: { name?: string }) => {
                   if (onDrill && entry?.name) onDrill(entry.name);
@@ -1057,7 +1062,7 @@ function FeedbackChart({ rows }: { rows: NpiRow[] }) {
                 outerRadius={120}
                 dataKey="value"
                 nameKey="name"
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
                 labelLine
               >
                 {data.map((_, index) => (
