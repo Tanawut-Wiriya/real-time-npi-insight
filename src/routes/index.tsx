@@ -618,10 +618,10 @@ function KpiCard({
         {revenue !== undefined && (
           <div className="text-right">
             <div className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-              Revenue
+              Revenue (USD)
             </div>
             <div className="text-sm font-semibold tabular-nums text-primary">
-              {revenue.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+              {formatUsd(revenue)}
             </div>
           </div>
         )}
