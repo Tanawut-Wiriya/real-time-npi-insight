@@ -758,6 +758,9 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
                     <TableCell className="max-w-[240px] truncate text-xs" title={r.Remark}>
                       {r.Remark || "-"}
                     </TableCell>
+                    <TableCell className="text-right tabular-nums text-xs">
+                      {r.Revenue.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
