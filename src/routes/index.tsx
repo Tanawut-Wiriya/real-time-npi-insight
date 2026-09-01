@@ -92,6 +92,14 @@ function parseDateStr(s: string): Date | null {
   return isNaN(d.getTime()) ? null : d;
 }
 
+function formatUsd(value: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
 function shipmentStatus(shipment: string, estimate: string): "on-time" | "delay" | "unknown" {
   const s = parseDateStr(shipment);
   const e = parseDateStr(estimate);
