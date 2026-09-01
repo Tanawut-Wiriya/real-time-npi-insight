@@ -459,7 +459,9 @@ function Dashboard() {
                         }}
                       />
                       <Legend />
-                      <Bar dataKey="Count" name="Products" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="Count" name="Projects" fill="var(--chart-1)" radius={[4, 4, 0, 0]}>
+                        <LabelList dataKey="Count" position="top" fontSize={11} fill="var(--foreground)" />
+                      </Bar>
                     </BarChart>
                   ) : (
                     <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
