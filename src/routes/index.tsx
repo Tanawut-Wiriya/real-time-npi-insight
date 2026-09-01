@@ -204,9 +204,7 @@ function Dashboard() {
     );
   }, [filtered]);
 
-const totalQty = filtered.reduce((s, r) => s + r.Quantity, 0);
-
-// Rows for the selected year (used by the Total Projects / Delivered / In progress KPIs)
+  // Rows for the selected year (used by the Total Projects / Delivered / In progress KPIs)
   const yearRows = useMemo(
     () =>
       year === ALL ? rows : rows.filter((r) => String(r.Year) === year),
