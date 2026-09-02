@@ -1041,7 +1041,7 @@ function FeedbackChart({ rows }: { rows: NpiRow[] }) {
     percent?: number;
     x?: number;
     y?: number;
-    textAnchor?: string;
+    textAnchor?: "inherit" | "start" | "middle" | "end";
   }) => {
     const { name = "", value = 0, percent = 0, x = 0, y = 0, textAnchor = "middle" } = props;
     const revenue = data.find((d) => d.name === name)?.revenue ?? 0;
