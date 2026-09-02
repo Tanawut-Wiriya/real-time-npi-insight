@@ -1019,17 +1019,41 @@ function StatusDrilldownModal({
 
 function FeedbackChart({ rows }: { rows: NpiRow[] }) {
   const data = useMemo(() => {
-    const map = new Map<string, number>();
+    const countMap = new Map<string, number>();
+    const revenueMap = new Map<string, number>();
     for (const r of rows) {
       const fb = (r.CustomerFeedback || "").trim();
       if (!fb || fb === "-") continue;
-      map.set(fb, (map.get(fb) || 0) + 1);
+      countMap.set(fb, (countMap.get(fb) || 0) + 1);
+      revenueMap.set(fb, (revenueMap.get(fb) || 0) + r.Revenue);
     }
-    return Array.from(map.entries())
-      .map(([name, value]) => ({ name, value }))
+    return Array.from(countMap.entries())
+      .map(([name, value]) => ({ name, value, revenue: revenueMap.get(name) || 0 }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 15);
   }, [rows]);
+
+  const totalRevenue = useMemo(() => data.reduce((s, d) => s + d.revenue, 0), [data]);
+
+  const renderLabel = (props: {
+    name?: string;
+    value?: number;
+    percent?: number;
+    x?: number;
+    y?: number;
+    textAnchor?: string;
+  }) => {
+    const { name = "", value = 0, percent = 0, x = 0, y = 0, textAnchor = "middle" } = props;
+    const revenue = data.find((d) => d.name === name)?.revenue ?? 0;
+    return (
+      <text x={x} y={y} textAnchor={textAnchor} fill="var(--foreground)" fontSize={10}>
+        <tspan x={x} dy="-0.2em">{`${name}: ${value} (${(percent * 100).toFixed(0)}%)`}</tspan>
+        <tspan x={x} dy="1.2em" fill="var(--muted-foreground)">
+          {formatUsd(revenue)}
+        </tspan>
+      </text>
+    );
+  };
 
   return (
     <Card className="p-5">
@@ -1037,6 +1061,9 @@ function FeedbackChart({ rows }: { rows: NpiRow[] }) {
         <h2 className="text-lg font-semibold">Customer Feedback</h2>
         <p className="text-xs text-muted-foreground">
           จำนวนรายการตามประเภท Customer feedback (สูงสุด 15 อันดับ)
+          {totalRevenue > 0 && (
+            <span className="ml-1">· รวม Revenue {formatUsd(totalRevenue)}</span>
+          )}
         </p>
       </div>
       {data.length === 0 ? (
@@ -1052,17 +1079,20 @@ function FeedbackChart({ rows }: { rows: NpiRow[] }) {
                   borderRadius: 8,
                   fontFamily: "Kanit",
                 }}
-                formatter={(value: number, name: string) => [`${value.toLocaleString()} รายการ`, name]}
+                formatter={(value: number, name: string, props: { payload?: { revenue?: number } }) => {
+                  const revenue = props?.payload?.revenue ?? 0;
+                  return [`${value.toLocaleString()} รายการ · Revenue ${formatUsd(revenue)}`, name];
+                }}
               />
               <Legend />
               <Pie
                 data={data}
                 cx="50%"
                 cy="50%"
-                outerRadius={120}
+                outerRadius={110}
                 dataKey="value"
                 nameKey="name"
-                label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
+                label={renderLabel}
                 labelLine
               >
                 {data.map((_, index) => (
