@@ -446,7 +446,7 @@ function Dashboard() {
                     <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                       <XAxis dataKey="YearMonth" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
-                      <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
+                      <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" domain={[0, Math.max(...chartData.map((d) => d.Count), 1) + 2]} />
                       <Tooltip
                         contentStyle={{
                           background: "var(--popover)",
@@ -464,7 +464,7 @@ function Dashboard() {
                     <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                       <XAxis dataKey="YearMonth" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
-                      <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
+                      <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" domain={[0, Math.max(...chartData.map((d) => d.Count), 1) + 2]} />
                       <Tooltip
                         contentStyle={{
                           background: "var(--popover)",
@@ -876,9 +876,9 @@ function StatusPieChart({
   return (
     <Card className="p-5">
       <div className="mb-4">
-        <h2 className="text-lg font-semibold">Status of projects</h2>
+        <h2 className="text-lg font-semibold">Overall status</h2>
         <p className="text-xs text-muted-foreground">
-          สัดส่วนสถานะของ Product ตามตัวกรองที่เลือก · ดับเบิลคลิกที่ชิ้นส่วนเพื่อดูรายละเอียด
+          สัดส่วนสถานะของ Projects ตามตัวกรองที่เลือก · ดับเบิลคลิกที่ชิ้นส่วนเพื่อดูรายละเอียด
         </p>
       </div>
       {data.length === 0 ? (
@@ -1057,7 +1057,7 @@ function FeedbackChart({ rows }: { rows: NpiRow[] }) {
       <div className="mb-4">
         <h2 className="text-lg font-semibold">Customer Feedback</h2>
         <p className="text-xs text-muted-foreground">
-          จำนวนรายการตามประเภท Customer feedback (สูงสุด 15 อันดับ)
+          สัดส่วน Customer Feedback ตามตัวกรองที่เลือก
           {totalRevenue > 0 && (
             <span className="ml-1">· รวม Revenue {formatUsd(totalRevenue)}</span>
           )}
@@ -1377,7 +1377,7 @@ function AsmlDashboard() {
                     <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                       <XAxis dataKey="YearMonth" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
-                      <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
+                      <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" domain={[0, Math.max(...chartData.map((d) => d.Count), 1) + 2]} />
                       <Tooltip
                         contentStyle={{
                            background: "var(--popover)",
@@ -1393,7 +1393,7 @@ function AsmlDashboard() {
                     <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                       <XAxis dataKey="YearMonth" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
-                      <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
+                      <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" domain={[0, Math.max(...chartData.map((d) => d.Count), 1) + 2]} />
                       <Tooltip
                         contentStyle={{
                            background: "var(--popover)",
