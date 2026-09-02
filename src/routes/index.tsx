@@ -23,6 +23,7 @@ import {
   ArrowUpDown,
   BarChart3,
   Factory,
+  HardHat,
   Inbox,
   LineChart as LineIcon,
   Loader2,
@@ -375,13 +376,6 @@ function Dashboard() {
             onClick={() => setShowTotal(true)}
           />
           <KpiCard
-            label="In production"
-            value={inProductionCount.toLocaleString()}
-            subValue={`Total QTY: ${inProductionQty.toLocaleString()}`}
-            revenue={inProductionRevenue}
-            icon={<Factory className="h-4 w-4" />}
-          />
-          <KpiCard
             label="Delivered"
             value={deliveredCount.toLocaleString()}
             subValue={`Total QTY: ${deliveredQty.toLocaleString()}`}
@@ -393,11 +387,18 @@ function Dashboard() {
             }}
           />
           <KpiCard
+            label="In production"
+            value={inProductionCount.toLocaleString()}
+            subValue={`Total QTY: ${inProductionQty.toLocaleString()}`}
+            revenue={inProductionRevenue}
+            icon={<Factory className="h-4 w-4" />}
+          />
+          <KpiCard
             label="In progress"
             value={inProgressCount.toLocaleString()}
             subValue={`Total QTY: ${inProgressQty.toLocaleString()}`}
             revenue={inProgressRevenue}
-            icon={<Wrench className="h-4 w-4" />}
+            icon={<HardHat className="h-4 w-4" />}
             onClick={() => setShowInProgress(true)}
           />
         </div>
