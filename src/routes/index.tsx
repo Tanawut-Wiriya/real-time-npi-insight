@@ -213,18 +213,14 @@ function Dashboard() {
     );
   }, [filtered]);
 
-  // Rows for the selected year (used by the Total Projects / Delivered / In progress KPIs)
-  const yearRows = useMemo(
-    () =>
-      year === ALL ? rows : rows.filter((r) => String(r.Year) === year),
-    [rows, year],
-  );
+  // KPI scope: follows all active filters (year, month, status, product)
+  const yearRows = filtered;
 
-// Total Projects: count of rows for the selected year + their total quantity
+// Total Projects: count of filtered rows + their total quantity
   const totalProjectsCount = yearRows.length;
   const totalProjectsQty = yearRows.reduce((s, r) => s + r.Quantity, 0);
 
-  // Delivered: rows for the selected year with Status "Delivered"
+  // Delivered: filtered rows with Status "Delivered"
   const deliveredRows = useMemo(
     () => yearRows.filter((r) => /^delivered$/i.test(r.Status.trim())),
     [yearRows],
