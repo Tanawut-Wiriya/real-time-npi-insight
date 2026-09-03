@@ -346,7 +346,7 @@ function Dashboard() {
       <main className="mx-auto max-w-[1400px] space-y-6 px-6 py-6">
         {/* Filters */}
         <Card className="p-4">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
             <FilterSelect
               label="Year"
               value={year}
@@ -372,6 +372,12 @@ function Dashboard() {
               onChange={setProduct}
               options={products.map(String)}
             />
+            <FilterSelect
+              label="Feedback"
+              value={feedback}
+              onChange={setFeedback}
+              options={feedbacks.map(String)}
+            />
             <div className="flex items-end">
               <Button variant="outline" onClick={reset} className="w-full">
                 <RefreshCw className="mr-2 h-4 w-4" />
@@ -382,7 +388,7 @@ function Dashboard() {
         </Card>
 
         {/* KPIs */}
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
 <KpiCard
             label="Total Projects"
             value={totalProjectsCount.toLocaleString()}
@@ -408,6 +414,7 @@ function Dashboard() {
             subValue={`Total QTY: ${inProductionQty.toLocaleString()}`}
             revenue={inProductionRevenue}
             icon={<Factory className="h-4 w-4" />}
+            onClick={() => setShowInProduction(true)}
           />
           <KpiCard
             label="In progress"
@@ -416,6 +423,14 @@ function Dashboard() {
             revenue={inProgressRevenue}
             icon={<HardHat className="h-4 w-4" />}
             onClick={() => setShowInProgress(true)}
+          />
+          <KpiCard
+            label="Wait approval"
+            value={waitApprovalCount.toLocaleString()}
+            subValue={`Total QTY: ${waitApprovalQty.toLocaleString()}`}
+            revenue={waitApprovalRevenue}
+            icon={<Hourglass className="h-4 w-4" />}
+            onClick={() => setShowWaitApproval(true)}
           />
         </div>
 
@@ -527,6 +542,22 @@ function Dashboard() {
           status="In Progress"
           rows={inProgressRows}
           onClose={() => setShowInProgress(false)}
+        />
+      )}
+
+      {showInProduction && (
+        <StatusDrilldownModal
+          status="In Production"
+          rows={inProductionRows}
+          onClose={() => setShowInProduction(false)}
+        />
+      )}
+
+      {showWaitApproval && (
+        <StatusDrilldownModal
+          status="Wait Approval (w.customer)"
+          rows={waitApprovalRows}
+          onClose={() => setShowWaitApproval(false)}
         />
       )}
 
