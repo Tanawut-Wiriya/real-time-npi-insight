@@ -24,6 +24,7 @@ import {
   BarChart3,
   Factory,
   HardHat,
+  Hourglass,
   Inbox,
   LineChart as LineIcon,
   Loader2,
@@ -150,6 +151,7 @@ function Dashboard() {
   const [month, setMonth] = useState<string>(ALL);
   const [status, setStatus] = useState<string>(ALL);
   const [product, setProduct] = useState<string>(ALL);
+  const [feedback, setFeedback] = useState<string>(ALL);
 
   const uniq = (arr: (string | number)[]) =>
     Array.from(new Set(arr.filter((v) => v !== "" && v != null))).sort((a, b) =>
@@ -168,6 +170,7 @@ function Dashboard() {
   );
   const statuses = useMemo(() => uniq(rows.map((r) => r.Status)), [rows]);
   const products = useMemo(() => uniq(rows.map((r) => r.Product)), [rows]);
+  const feedbacks = useMemo(() => uniq(rows.map((r) => r.CustomerFeedback)), [rows]);
 
   // Default to the latest year on first load
   const [yearInitialized, setYearInitialized] = useState(false);
@@ -184,6 +187,8 @@ function Dashboard() {
   const [chartType, setChartType] = useState<"bar" | "line">("bar");
   const [drillStatus, setDrillStatus] = useState<string | null>(null);
   const [showInProgress, setShowInProgress] = useState(false);
+  const [showInProduction, setShowInProduction] = useState(false);
+  const [showWaitApproval, setShowWaitApproval] = useState(false);
   const [showTotal, setShowTotal] = useState(false);
   const [showDelivered, setShowDelivered] = useState(false);
   const [deliveredFilter, setDeliveredFilter] = useState<"all" | "ontime" | "delay" | "unknown">("all");
@@ -196,9 +201,10 @@ function Dashboard() {
           (year === ALL || String(r.Year) === year) &&
           (month === ALL || r.YearMonth?.split("-")[1] === month) &&
           (status === ALL || r.Status === status) &&
-          (product === ALL || r.Product === product),
+          (product === ALL || r.Product === product) &&
+          (feedback === ALL || r.CustomerFeedback === feedback),
       ),
-    [rows, year, month, status, product],
+    [rows, year, month, status, product, feedback],
   );
 
   const chartData = useMemo(() => {
@@ -245,11 +251,20 @@ function Dashboard() {
   const inProductionCount = inProductionRows.length;
   const inProductionQty = inProductionRows.reduce((s, r) => s + r.Quantity, 0);
 
+  // Wait approval: rows whose Customer Feedback is "w.customer"
+  const waitApprovalRows = useMemo(
+    () => yearRows.filter((r) => /^w\.?customer$/i.test(r.CustomerFeedback.trim())),
+    [yearRows],
+  );
+  const waitApprovalCount = waitApprovalRows.length;
+  const waitApprovalQty = waitApprovalRows.reduce((s, r) => s + r.Quantity, 0);
+
   // Revenue sums (same scope as the quantity sums above)
   const totalProjectsRevenue = yearRows.reduce((s, r) => s + r.Revenue, 0);
   const deliveredRevenue = deliveredRows.reduce((s, r) => s + r.Revenue, 0);
   const inProgressRevenue = inProgressRows.reduce((s, r) => s + r.Revenue, 0);
   const inProductionRevenue = inProductionRows.reduce((s, r) => s + r.Revenue, 0);
+  const waitApprovalRevenue = waitApprovalRows.reduce((s, r) => s + r.Revenue, 0);
 
   const deliveredShipment = useMemo(() => {
     let onTime = 0;
@@ -282,6 +297,7 @@ function Dashboard() {
     setMonth(ALL);
     setStatus(ALL);
     setProduct(ALL);
+    setFeedback(ALL);
   };
 
   if (isLoading) return <DashboardSkeleton />;
@@ -330,7 +346,7 @@ function Dashboard() {
       <main className="mx-auto max-w-[1400px] space-y-6 px-6 py-6">
         {/* Filters */}
         <Card className="p-4">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
             <FilterSelect
               label="Year"
               value={year}
@@ -356,6 +372,12 @@ function Dashboard() {
               onChange={setProduct}
               options={products.map(String)}
             />
+            <FilterSelect
+              label="Feedback"
+              value={feedback}
+              onChange={setFeedback}
+              options={feedbacks.map(String)}
+            />
             <div className="flex items-end">
               <Button variant="outline" onClick={reset} className="w-full">
                 <RefreshCw className="mr-2 h-4 w-4" />
@@ -366,7 +388,7 @@ function Dashboard() {
         </Card>
 
         {/* KPIs */}
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
 <KpiCard
             label="Total Projects"
             value={totalProjectsCount.toLocaleString()}
@@ -392,6 +414,7 @@ function Dashboard() {
             subValue={`Total QTY: ${inProductionQty.toLocaleString()}`}
             revenue={inProductionRevenue}
             icon={<Factory className="h-4 w-4" />}
+            onClick={() => setShowInProduction(true)}
           />
           <KpiCard
             label="In progress"
@@ -400,6 +423,14 @@ function Dashboard() {
             revenue={inProgressRevenue}
             icon={<HardHat className="h-4 w-4" />}
             onClick={() => setShowInProgress(true)}
+          />
+          <KpiCard
+            label="Wait approval"
+            value={waitApprovalCount.toLocaleString()}
+            subValue={`Total QTY: ${waitApprovalQty.toLocaleString()}`}
+            revenue={waitApprovalRevenue}
+            icon={<Hourglass className="h-4 w-4" />}
+            onClick={() => setShowWaitApproval(true)}
           />
         </div>
 
@@ -511,6 +542,22 @@ function Dashboard() {
           status="In Progress"
           rows={inProgressRows}
           onClose={() => setShowInProgress(false)}
+        />
+      )}
+
+      {showInProduction && (
+        <StatusDrilldownModal
+          status="In Production"
+          rows={inProductionRows}
+          onClose={() => setShowInProduction(false)}
+        />
+      )}
+
+      {showWaitApproval && (
+        <StatusDrilldownModal
+          status="Wait Approval (w.customer)"
+          rows={waitApprovalRows}
+          onClose={() => setShowWaitApproval(false)}
         />
       )}
 
