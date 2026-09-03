@@ -345,8 +345,8 @@ function Dashboard() {
 
       <main className="mx-auto max-w-[1400px] space-y-6 px-6 py-6">
         {/* Filters */}
-        <Card className="p-4">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
+        <Card className="p-3">
+          <div className="grid grid-cols-6 gap-2">
             <FilterSelect
               label="Year"
               value={year}
@@ -359,7 +359,6 @@ function Dashboard() {
               onChange={setMonth}
               options={months.map(String)}
             />
-
             <FilterSelect
               label="Status"
               value={status}
@@ -367,7 +366,7 @@ function Dashboard() {
               options={statuses.map(String)}
             />
             <FilterSelect
-              label="Product"
+              label="Customer"
               value={product}
               onChange={setProduct}
               options={products.map(String)}
@@ -379,9 +378,9 @@ function Dashboard() {
               options={feedbacks.map(String)}
             />
             <div className="flex items-end">
-              <Button variant="outline" onClick={reset} className="w-full">
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Reset Filters
+              <Button variant="outline" size="sm" onClick={reset} className="h-8 w-full text-xs">
+                <RefreshCw className="mr-1 h-3 w-3" />
+                Reset
               </Button>
             </div>
           </div>
@@ -608,10 +607,10 @@ function FilterSelect({
   options: string[];
 }) {
   return (
-    <div className="space-y-1.5">
-      <label className="text-xs font-medium text-muted-foreground">{label}</label>
+    <div className="space-y-1">
+      <label className="text-[11px] font-medium text-muted-foreground">{label}</label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className="w-full">
+        <SelectTrigger className="h-8 w-full text-xs">
           <SelectValue placeholder={`All ${label}`} />
         </SelectTrigger>
         <SelectContent>
