@@ -607,10 +607,10 @@ function FilterSelect({
   options: string[];
 }) {
   return (
-    <div className="space-y-1.5">
-      <label className="text-xs font-medium text-muted-foreground">{label}</label>
+    <div className="space-y-1">
+      <label className="text-[11px] font-medium text-muted-foreground">{label}</label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className="w-full">
+        <SelectTrigger className="h-8 w-full text-xs">
           <SelectValue placeholder={`All ${label}`} />
         </SelectTrigger>
         <SelectContent>
