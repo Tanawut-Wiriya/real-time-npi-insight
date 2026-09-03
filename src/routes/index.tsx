@@ -1043,7 +1043,7 @@ function FeedbackChart({ rows }: { rows: NpiRow[] }) {
     const { name = "", value = 0, percent = 0, x = 0, y = 0, textAnchor = "middle" } = props;
     const revenue = data.find((d) => d.name === name)?.revenue ?? 0;
     return (
-      <text x={x} y={y} textAnchor={textAnchor} fill="var(--foreground)" fontSize={10}>
+      <text x={x} y={y} textAnchor={textAnchor} fill="var(--foreground)" fontSize={14}>
         <tspan x={x} dy="-0.2em">{`${name}: ${value} (${(percent * 100).toFixed(0)}%)`}</tspan>
         <tspan x={x} dy="1.2em" fill="var(--muted-foreground)">
           {formatUsd(revenue)}
