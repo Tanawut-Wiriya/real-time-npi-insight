@@ -459,7 +459,7 @@ function Dashboard() {
               <div>
                 <h2 className="text-lg font-semibold">Projects Count by Month</h2>
                 <p className="text-xs text-muted-foreground">
-                  จำนวน Project ต่อเดือน ตามตัวกรองที่เลือก
+                  จำนวน Project ต่อเดือน ตามตัวกรองที่เลือก · คลิกที่กราฟเพื่อดูรายละเอียด
                 </p>
               </div>
               <div className="flex gap-1 rounded-md border p-0.5">
@@ -491,7 +491,7 @@ function Dashboard() {
               <div className="h-[340px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   {chartType === "bar" ? (
-                    <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+                    <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }} onClick={(s: { activeLabel?: string }) => { if (s?.activeLabel) setDrillMonth(String(s.activeLabel)); }} style={{ cursor: "pointer" }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                       <XAxis dataKey="YearMonth" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
                       <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" domain={[0, Math.max(...chartData.map((d) => d.Count), 1) + 2]} />
