@@ -609,6 +609,22 @@ function Dashboard() {
           onClose={() => setDrillStatus(null)}
         />
       )}
+
+      {drillMonth && (
+        <StatusDrilldownModal
+          status={`เดือน ${drillMonth}`}
+          rows={drillMonthRows}
+          onClose={() => setDrillMonth(null)}
+        />
+      )}
+
+      {drillFeedback && (
+        <StatusDrilldownModal
+          status={`Feedback: ${drillFeedback}`}
+          rows={drillFeedbackRows}
+          onClose={() => setDrillFeedback(null)}
+        />
+      )}
     </div>
   );
 }
@@ -942,7 +958,7 @@ function StatusPieChart({
       <div className="mb-4">
         <h2 className="text-lg font-semibold">Overall status</h2>
         <p className="text-xs text-muted-foreground">
-          สัดส่วนสถานะของ Projects ตามตัวกรองที่เลือก · ดับเบิลคลิกที่ชิ้นส่วนเพื่อดูรายละเอียด
+          สัดส่วนสถานะของ Projects ตามตัวกรองที่เลือก · คลิกที่ชิ้นส่วนเพื่อดูรายละเอียด
         </p>
       </div>
       {data.length === 0 ? (
