@@ -509,7 +509,7 @@ function Dashboard() {
                       </Bar>
                     </BarChart>
                   ) : (
-                    <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+                    <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }} onClick={(s: { activeLabel?: string }) => { if (s?.activeLabel) setDrillMonth(String(s.activeLabel)); }} style={{ cursor: "pointer" }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                       <XAxis dataKey="YearMonth" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
                       <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" domain={[0, Math.max(...chartData.map((d) => d.Count), 1) + 2]} />
@@ -547,7 +547,7 @@ function Dashboard() {
           />
 
           {/* Customer Feedback Chart */}
-          <FeedbackChart rows={filtered} />
+          <FeedbackChart rows={filtered} onDrill={setDrillFeedback} />
         </div>
 
         {/* Table */}
