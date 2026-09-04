@@ -1143,7 +1143,7 @@ function FeedbackChart({
       <div className="mb-4">
         <h2 className="text-lg font-semibold">Customer Feedback</h2>
         <p className="text-xs text-muted-foreground">
-          สัดส่วน Customer Feedback ตามตัวกรองที่เลือก
+          สัดส่วน Customer Feedback ตามตัวกรองที่เลือก · คลิกที่ชิ้นส่วนเพื่อดูรายละเอียด
           {totalRevenue > 0 && (
             <span className="ml-1">· รวม Revenue {formatUsd(totalRevenue)}</span>
           )}
