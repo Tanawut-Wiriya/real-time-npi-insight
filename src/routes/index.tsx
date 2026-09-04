@@ -192,6 +192,8 @@ function Dashboard() {
   const [showTotal, setShowTotal] = useState(false);
   const [showDelivered, setShowDelivered] = useState(false);
   const [deliveredFilter, setDeliveredFilter] = useState<"all" | "ontime" | "delay" | "unknown">("all");
+  const [drillMonth, setDrillMonth] = useState<string | null>(null);
+  const [drillFeedback, setDrillFeedback] = useState<string | null>(null);
 
 
   const filtered = useMemo(
@@ -290,6 +292,22 @@ function Dashboard() {
   const drillRows = useMemo(
     () => (drillStatus ? filtered.filter((r) => r.Status === drillStatus) : []),
     [filtered, drillStatus],
+  );
+
+  const drillMonthRows = useMemo(
+    () =>
+      drillMonth
+        ? filtered.filter((r) => (r.YearMonth || "Unknown") === drillMonth)
+        : [],
+    [filtered, drillMonth],
+  );
+
+  const drillFeedbackRows = useMemo(
+    () =>
+      drillFeedback
+        ? filtered.filter((r) => (r.CustomerFeedback || "").trim() === drillFeedback)
+        : [],
+    [filtered, drillFeedback],
   );
 
   const reset = () => {
@@ -441,7 +459,7 @@ function Dashboard() {
               <div>
                 <h2 className="text-lg font-semibold">Projects Count by Month</h2>
                 <p className="text-xs text-muted-foreground">
-                  จำนวน Project ต่อเดือน ตามตัวกรองที่เลือก
+                  จำนวน Project ต่อเดือน ตามตัวกรองที่เลือก · คลิกที่กราฟเพื่อดูรายละเอียด
                 </p>
               </div>
               <div className="flex gap-1 rounded-md border p-0.5">
@@ -473,7 +491,7 @@ function Dashboard() {
               <div className="h-[340px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   {chartType === "bar" ? (
-                    <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+                    <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }} onClick={(s: { activeLabel?: string }) => { if (s?.activeLabel) setDrillMonth(String(s.activeLabel)); }} style={{ cursor: "pointer" }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                       <XAxis dataKey="YearMonth" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
                       <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" domain={[0, Math.max(...chartData.map((d) => d.Count), 1) + 2]} />
@@ -491,7 +509,7 @@ function Dashboard() {
                       </Bar>
                     </BarChart>
                   ) : (
-                    <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+                    <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }} onClick={(s: { activeLabel?: string }) => { if (s?.activeLabel) setDrillMonth(String(s.activeLabel)); }} style={{ cursor: "pointer" }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                       <XAxis dataKey="YearMonth" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
                       <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" domain={[0, Math.max(...chartData.map((d) => d.Count), 1) + 2]} />
@@ -529,7 +547,7 @@ function Dashboard() {
           />
 
           {/* Customer Feedback Chart */}
-          <FeedbackChart rows={filtered} />
+          <FeedbackChart rows={filtered} onDrill={setDrillFeedback} />
         </div>
 
         {/* Table */}
@@ -589,6 +607,22 @@ function Dashboard() {
           status={drillStatus}
           rows={drillRows}
           onClose={() => setDrillStatus(null)}
+        />
+      )}
+
+      {drillMonth && (
+        <StatusDrilldownModal
+          status={`เดือน ${drillMonth}`}
+          rows={drillMonthRows}
+          onClose={() => setDrillMonth(null)}
+        />
+      )}
+
+      {drillFeedback && (
+        <StatusDrilldownModal
+          status={`Feedback: ${drillFeedback}`}
+          rows={drillFeedbackRows}
+          onClose={() => setDrillFeedback(null)}
         />
       )}
     </div>
@@ -924,7 +958,7 @@ function StatusPieChart({
       <div className="mb-4">
         <h2 className="text-lg font-semibold">Overall status</h2>
         <p className="text-xs text-muted-foreground">
-          สัดส่วนสถานะของ Projects ตามตัวกรองที่เลือก · ดับเบิลคลิกที่ชิ้นส่วนเพื่อดูรายละเอียด
+          สัดส่วนสถานะของ Projects ตามตัวกรองที่เลือก · คลิกที่ชิ้นส่วนเพื่อดูรายละเอียด
         </p>
       </div>
       {data.length === 0 ? (
@@ -952,7 +986,7 @@ function StatusPieChart({
                 nameKey="name"
                 label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
                 labelLine
-                onDoubleClick={(entry: { name?: string }) => {
+                onClick={(entry: { name?: string }) => {
                   if (onDrill && entry?.name) onDrill(entry.name);
                 }}
                 style={{ cursor: onDrill ? "pointer" : "default" }}
@@ -961,7 +995,7 @@ function StatusPieChart({
                   <Cell
                     key={`cell-${index}`}
                     fill={getStatusColor(entry.name)}
-                    onDoubleClick={() => onDrill?.(entry.name)}
+                    onClick={() => onDrill?.(entry.name)}
                   />
                 ))}
               </Pie>
@@ -1060,7 +1094,13 @@ function StatusDrilldownModal({
   );
 }
 
-function FeedbackChart({ rows }: { rows: NpiRow[] }) {
+function FeedbackChart({
+  rows,
+  onDrill,
+}: {
+  rows: NpiRow[];
+  onDrill?: (feedback: string) => void;
+}) {
   const data = useMemo(() => {
     const countMap = new Map<string, number>();
     const revenueMap = new Map<string, number>();
@@ -1103,7 +1143,7 @@ function FeedbackChart({ rows }: { rows: NpiRow[] }) {
       <div className="mb-4">
         <h2 className="text-lg font-semibold">Customer Feedback</h2>
         <p className="text-xs text-muted-foreground">
-          สัดส่วน Customer Feedback ตามตัวกรองที่เลือก
+          สัดส่วน Customer Feedback ตามตัวกรองที่เลือก · คลิกที่ชิ้นส่วนเพื่อดูรายละเอียด
           {totalRevenue > 0 && (
             <span className="ml-1">· รวม Revenue {formatUsd(totalRevenue)}</span>
           )}
@@ -1137,11 +1177,16 @@ function FeedbackChart({ rows }: { rows: NpiRow[] }) {
                 nameKey="name"
                 label={renderLabel}
                 labelLine
+                onClick={(entry: { name?: string }) => {
+                  if (onDrill && entry?.name) onDrill(entry.name);
+                }}
+                style={{ cursor: onDrill ? "pointer" : "default" }}
               >
-                {data.map((_, index) => (
+                {data.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={`var(--chart-${(index % 5) + 1})`}
+                    onClick={() => onDrill?.(entry.name)}
                   />
                 ))}
               </Pie>
@@ -1194,7 +1239,7 @@ function DeliveredShipmentChart({
         <div>
           <h2 className="text-lg font-semibold">Delivered — Shipment vs Estimate</h2>
           <p className="text-xs text-muted-foreground">
-            สรุปรวมทั้งปี · เปรียบเทียบ On-time กับ Delay · ดับเบิลคลิกที่ชิ้นส่วนเพื่อดูรายละเอียด
+            สรุปรวมทั้งปี · เปรียบเทียบ On-time กับ Delay · คลิกที่ชิ้นส่วนเพื่อดูรายละเอียด
           </p>
         </div>
         <div className="flex flex-wrap gap-2 text-xs">
@@ -1240,7 +1285,7 @@ function DeliveredShipmentChart({
                   <Cell
                     key={entry.key}
                     fill={entry.color}
-                    onDoubleClick={() => onDrill?.(entry.key as "ontime" | "delay" | "unknown")}
+                    onClick={() => onDrill?.(entry.key as "ontime" | "delay" | "unknown")}
                     style={{ cursor: onDrill ? "pointer" : "default" }}
                   />
                 ))}
