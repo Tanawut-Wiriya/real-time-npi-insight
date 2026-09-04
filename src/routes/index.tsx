@@ -986,7 +986,7 @@ function StatusPieChart({
                 nameKey="name"
                 label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
                 labelLine
-                onDoubleClick={(entry: { name?: string }) => {
+                onClick={(entry: { name?: string }) => {
                   if (onDrill && entry?.name) onDrill(entry.name);
                 }}
                 style={{ cursor: onDrill ? "pointer" : "default" }}
@@ -995,7 +995,7 @@ function StatusPieChart({
                   <Cell
                     key={`cell-${index}`}
                     fill={getStatusColor(entry.name)}
-                    onDoubleClick={() => onDrill?.(entry.name)}
+                    onClick={() => onDrill?.(entry.name)}
                   />
                 ))}
               </Pie>
