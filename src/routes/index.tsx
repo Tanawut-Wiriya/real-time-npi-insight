@@ -158,19 +158,34 @@ function Dashboard() {
       String(a).localeCompare(String(b)),
     );
 
-  const years = useMemo(() => uniq(rows.map((r) => r.Year)), [rows]);
+  // Cascading filter options: each filter's options reflect rows remaining
+  // after all OTHER active filters are applied.
+  const applyFilters = useCallback(
+    (source: NpiRow[], except?: "year" | "month" | "status" | "product" | "feedback") =>
+      source.filter(
+        (r) =>
+          (except === "year" || year === ALL || String(r.Year) === year) &&
+          (except === "month" || month === ALL || r.YearMonth?.split("-")[1] === month) &&
+          (except === "status" || status === ALL || r.Status === status) &&
+          (except === "product" || product === ALL || r.Product === product) &&
+          (except === "feedback" || feedback === ALL || r.CustomerFeedback === feedback),
+      ),
+    [year, month, status, product, feedback],
+  );
+
+  const years = useMemo(() => uniq(applyFilters(rows, "year").map((r) => r.Year)), [rows, applyFilters]);
   const months = useMemo(
     () =>
       uniq(
-        rows
+        applyFilters(rows, "month")
           .map((r) => r.YearMonth?.split("-")[1])
           .filter((m): m is string => !!m),
       ),
-    [rows],
+    [rows, applyFilters],
   );
-  const statuses = useMemo(() => uniq(rows.map((r) => r.Status)), [rows]);
-  const products = useMemo(() => uniq(rows.map((r) => r.Product)), [rows]);
-  const feedbacks = useMemo(() => uniq(rows.map((r) => r.CustomerFeedback)), [rows]);
+  const statuses = useMemo(() => uniq(applyFilters(rows, "status").map((r) => r.Status)), [rows, applyFilters]);
+  const products = useMemo(() => uniq(applyFilters(rows, "product").map((r) => r.Product)), [rows, applyFilters]);
+  const feedbacks = useMemo(() => uniq(applyFilters(rows, "feedback").map((r) => r.CustomerFeedback)), [rows, applyFilters]);
 
   // Default to the latest year on first load
   const [yearInitialized, setYearInitialized] = useState(false);
