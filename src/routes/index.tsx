@@ -1177,11 +1177,16 @@ function FeedbackChart({
                 nameKey="name"
                 label={renderLabel}
                 labelLine
+                onClick={(entry: { name?: string }) => {
+                  if (onDrill && entry?.name) onDrill(entry.name);
+                }}
+                style={{ cursor: onDrill ? "pointer" : "default" }}
               >
-                {data.map((_, index) => (
+                {data.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={`var(--chart-${(index % 5) + 1})`}
+                    onClick={() => onDrill?.(entry.name)}
                   />
                 ))}
               </Pie>
