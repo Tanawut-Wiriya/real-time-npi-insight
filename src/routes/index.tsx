@@ -1239,7 +1239,7 @@ function DeliveredShipmentChart({
         <div>
           <h2 className="text-lg font-semibold">Delivered — Shipment vs Estimate</h2>
           <p className="text-xs text-muted-foreground">
-            สรุปรวมทั้งปี · เปรียบเทียบ On-time กับ Delay · ดับเบิลคลิกที่ชิ้นส่วนเพื่อดูรายละเอียด
+            สรุปรวมทั้งปี · เปรียบเทียบ On-time กับ Delay · คลิกที่ชิ้นส่วนเพื่อดูรายละเอียด
           </p>
         </div>
         <div className="flex flex-wrap gap-2 text-xs">
@@ -1285,7 +1285,7 @@ function DeliveredShipmentChart({
                   <Cell
                     key={entry.key}
                     fill={entry.color}
-                    onDoubleClick={() => onDrill?.(entry.key as "ontime" | "delay" | "unknown")}
+                    onClick={() => onDrill?.(entry.key as "ontime" | "delay" | "unknown")}
                     style={{ cursor: onDrill ? "pointer" : "default" }}
                   />
                 ))}
