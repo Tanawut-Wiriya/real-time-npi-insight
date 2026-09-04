@@ -1094,7 +1094,13 @@ function StatusDrilldownModal({
   );
 }
 
-function FeedbackChart({ rows }: { rows: NpiRow[] }) {
+function FeedbackChart({
+  rows,
+  onDrill,
+}: {
+  rows: NpiRow[];
+  onDrill?: (feedback: string) => void;
+}) {
   const data = useMemo(() => {
     const countMap = new Map<string, number>();
     const revenueMap = new Map<string, number>();
