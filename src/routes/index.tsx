@@ -192,6 +192,8 @@ function Dashboard() {
   const [showTotal, setShowTotal] = useState(false);
   const [showDelivered, setShowDelivered] = useState(false);
   const [deliveredFilter, setDeliveredFilter] = useState<"all" | "ontime" | "delay" | "unknown">("all");
+  const [drillMonth, setDrillMonth] = useState<string | null>(null);
+  const [drillFeedback, setDrillFeedback] = useState<string | null>(null);
 
 
   const filtered = useMemo(
@@ -290,6 +292,22 @@ function Dashboard() {
   const drillRows = useMemo(
     () => (drillStatus ? filtered.filter((r) => r.Status === drillStatus) : []),
     [filtered, drillStatus],
+  );
+
+  const drillMonthRows = useMemo(
+    () =>
+      drillMonth
+        ? filtered.filter((r) => (r.YearMonth || "Unknown") === drillMonth)
+        : [],
+    [filtered, drillMonth],
+  );
+
+  const drillFeedbackRows = useMemo(
+    () =>
+      drillFeedback
+        ? filtered.filter((r) => (r.CustomerFeedback || "").trim() === drillFeedback)
+        : [],
+    [filtered, drillFeedback],
   );
 
   const reset = () => {
