@@ -23,6 +23,7 @@ import {
   ArrowUpDown,
   BarChart3,
   Factory,
+  FileSpreadsheet,
   HardHat,
   Hourglass,
   Inbox,
@@ -33,6 +34,7 @@ import {
   Truck,
   Wrench,
 } from "lucide-react";
+import * as XLSX from "xlsx";
 import { getNpiData, getAsmlData, type NpiRow, type AsmlRow } from "@/lib/npi.functions";
 import {
   Select,
@@ -101,6 +103,33 @@ function formatUsd(value: number) {
     currency: "USD",
     maximumFractionDigits: 2,
   }).format(value);
+}
+
+function exportToExcel(rows: NpiRow[]) {
+  const data = rows.map((r) => ({
+    No: r.No,
+    Product: r.Product,
+    Country: r.Country,
+    Article: r.Article,
+    Description: r.Description,
+    Quantity: r.Quantity,
+    Year: r.Year,
+    YearMonth: r.YearMonth,
+    Status: r.Status,
+    Delivery: r.Delivery,
+    Start: r.Start,
+    Request: r.Request,
+    Plan: r.Plan,
+    CustomerFeedback: r.CustomerFeedback,
+    Remark: r.Remark,
+    EstimateShipment: r.EstimateShipment,
+    Shipment: r.Shipment,
+    Revenue: r.Revenue,
+  }));
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Projects");
+  XLSX.writeFile(wb, `projects-list-${new Date().toISOString().slice(0, 10)}.xlsx`);
 }
 
 function shipmentStatus(shipment: string, estimate: string): "on-time" | "delay" | "unknown" {
@@ -796,6 +825,15 @@ function DataTable({ rows }: { rows: NpiRow[] }) {
             {rows.length.toLocaleString()} รายการ
           </p>
         </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => exportToExcel(rows)}
+          disabled={rows.length === 0}
+        >
+          <FileSpreadsheet className="mr-1 h-3 w-3" />
+          Export Excel
+        </Button>
       </div>
       {rows.length === 0 ? (
         <div className="p-10">
