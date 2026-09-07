@@ -105,7 +105,7 @@ function formatUsd(value: number) {
   }).format(value);
 }
 
-function exportToExcel(rows: NpiRow[]) {
+function exportToExcel(rows: NpiRow[], filename?: string) {
   const data = rows.map((r) => ({
     No: r.No,
     Product: r.Product,
@@ -129,7 +129,7 @@ function exportToExcel(rows: NpiRow[]) {
   const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Projects");
-  XLSX.writeFile(wb, `projects-list-${new Date().toISOString().slice(0, 10)}.xlsx`);
+  XLSX.writeFile(wb, filename ?? `projects-list-${new Date().toISOString().slice(0, 10)}.xlsx`);
 }
 
 function shipmentStatus(shipment: string, estimate: string): "on-time" | "delay" | "unknown" {
@@ -1098,6 +1098,22 @@ function StatusDrilldownModal({
               จำนวน {rows.length.toLocaleString()} รายการที่อยู่ในสถานะนี้ (ตามตัวกรองปัจจุบัน)
             </p>
           </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              disabled={rows.length === 0}
+              onClick={() =>
+                exportToExcel(
+                  rows,
+                  `${status.replace(/[^a-zA-Z0-9]+/g, "-").toLowerCase()}-${new Date().toISOString().slice(0, 10)}.xlsx`
+                )
+              }
+            >
+              <FileSpreadsheet className="h-4 w-4" />
+              Export Excel
+            </Button>
           <button
             onClick={onClose}
             aria-label="Close"
@@ -1105,6 +1121,7 @@ function StatusDrilldownModal({
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
+          </div>
         </div>
         <div className="overflow-auto">
           {rows.length === 0 ? (
