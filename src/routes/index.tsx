@@ -1098,6 +1098,22 @@ function StatusDrilldownModal({
               จำนวน {rows.length.toLocaleString()} รายการที่อยู่ในสถานะนี้ (ตามตัวกรองปัจจุบัน)
             </p>
           </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              disabled={rows.length === 0}
+              onClick={() =>
+                exportToExcel(
+                  rows,
+                  `${status.replace(/[^a-zA-Z0-9]+/g, "-").toLowerCase()}-${new Date().toISOString().slice(0, 10)}.xlsx`
+                )
+              }
+            >
+              <FileSpreadsheet className="h-4 w-4" />
+              Export Excel
+            </Button>
           <button
             onClick={onClose}
             aria-label="Close"
