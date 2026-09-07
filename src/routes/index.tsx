@@ -1027,6 +1027,7 @@ function StatusPieChart({
                   borderRadius: 8,
                   fontFamily: "Kanit",
                 }}
+                labelStyle={{ display: "none" }}
                 formatter={(value: number, name: string) => [`${value.toLocaleString()} รายการ`, name]}
               />
               <Legend />
@@ -1232,6 +1233,7 @@ function FeedbackChart({
                   borderRadius: 8,
                   fontFamily: "Kanit",
                 }}
+                labelStyle={{ display: "none" }}
                 formatter={(value: number, name: string, props: { payload?: { revenue?: number } }) => {
                   const revenue = props?.payload?.revenue ?? 0;
                   return [`${value.toLocaleString()} รายการ · Revenue ${formatUsd(revenue)}`, name];
@@ -1337,6 +1339,7 @@ function DeliveredShipmentChart({
                   borderRadius: 8,
                   fontFamily: "Kanit",
                 }}
+                labelStyle={{ display: "none" }}
                 formatter={(value: number, name: string) => [`${value.toLocaleString()} รายการ`, name]}
               />
               <Legend />
@@ -1623,6 +1626,7 @@ function AsmlStatusPieChart({ rows }: { rows: AsmlRow[] }) {
                   borderRadius: 8,
                   fontFamily: "Kanit",
                 }}
+                labelStyle={{ display: "none" }}
                 formatter={(value: number, name: string) => [`${value.toLocaleString()} รายการ`, name]}
               />
               <Legend />
