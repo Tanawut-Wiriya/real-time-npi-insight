@@ -105,7 +105,7 @@ function formatUsd(value: number) {
   }).format(value);
 }
 
-function exportToExcel(rows: NpiRow[]) {
+function exportToExcel(rows: NpiRow[], filename?: string) {
   const data = rows.map((r) => ({
     No: r.No,
     Product: r.Product,
