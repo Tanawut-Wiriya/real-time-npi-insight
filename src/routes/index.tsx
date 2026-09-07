@@ -129,7 +129,7 @@ function exportToExcel(rows: NpiRow[], filename?: string) {
   const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Projects");
-  XLSX.writeFile(wb, `projects-list-${new Date().toISOString().slice(0, 10)}.xlsx`);
+  XLSX.writeFile(wb, filename ?? `projects-list-${new Date().toISOString().slice(0, 10)}.xlsx`);
 }
 
 function shipmentStatus(shipment: string, estimate: string): "on-time" | "delay" | "unknown" {
