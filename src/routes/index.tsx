@@ -1007,17 +1007,17 @@ function StatusPieChart({
   };
 
   return (
-    <Card className="p-5">
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold">Overall status</h2>
-        <p className="text-xs text-muted-foreground">
+    <Card className="p-4">
+      <div className="mb-3">
+        <h2 className="text-base font-semibold">Overall status</h2>
+        <p className="text-[11px] text-muted-foreground">
           สัดส่วนสถานะของ Projects ตามตัวกรองที่เลือก · คลิกที่ชิ้นส่วนเพื่อดูรายละเอียด
         </p>
       </div>
       {data.length === 0 ? (
         <EmptyState />
       ) : (
-        <div className="h-[340px] w-full">
+        <div className="h-[260px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Tooltip
@@ -1026,16 +1026,17 @@ function StatusPieChart({
                   border: "1px solid var(--border)",
                   borderRadius: 8,
                   fontFamily: "Kanit",
+                  fontSize: 12,
                 }}
                 labelStyle={{ display: "none" }}
                 formatter={(value: number, name: string) => [`${value.toLocaleString()} รายการ`, name]}
               />
-              <Legend />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
               <Pie
                 data={data}
                 cx="50%"
                 cy="50%"
-                outerRadius={100}
+                outerRadius={80}
                 dataKey="value"
                 nameKey="name"
                 label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
