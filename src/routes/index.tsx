@@ -1215,10 +1215,10 @@ function FeedbackChart({
   };
 
   return (
-    <Card className="p-5">
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold">Customer Feedback</h2>
-        <p className="text-xs text-muted-foreground">
+    <Card className="p-4">
+      <div className="mb-3">
+        <h2 className="text-base font-semibold">Customer Feedback</h2>
+        <p className="text-[11px] text-muted-foreground">
           สัดส่วน Customer Feedback ตามตัวกรองที่เลือก · คลิกที่ชิ้นส่วนเพื่อดูรายละเอียด
           {totalRevenue > 0 && (
             <span className="ml-1">· รวม Revenue {formatUsd(totalRevenue)}</span>
@@ -1228,7 +1228,7 @@ function FeedbackChart({
       {data.length === 0 ? (
         <EmptyState />
       ) : (
-        <div className="h-[400px] w-full">
+        <div className="h-[280px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Tooltip
@@ -1237,6 +1237,7 @@ function FeedbackChart({
                   border: "1px solid var(--border)",
                   borderRadius: 8,
                   fontFamily: "Kanit",
+                  fontSize: 12,
                 }}
                 labelStyle={{ display: "none" }}
                 formatter={(value: number, name: string, props: { payload?: { revenue?: number } }) => {
@@ -1244,12 +1245,12 @@ function FeedbackChart({
                   return [`${value.toLocaleString()} รายการ · Revenue ${formatUsd(revenue)}`, name];
                 }}
               />
-              <Legend />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
               <Pie
                 data={data}
                 cx="50%"
                 cy="50%"
-                outerRadius={110}
+                outerRadius={85}
                 dataKey="value"
                 nameKey="name"
                 label={renderLabel}
