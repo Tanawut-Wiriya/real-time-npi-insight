@@ -1312,17 +1312,17 @@ function DeliveredShipmentChart({
   const pct = (v: number) => (total ? ((v / total) * 100).toFixed(1) : "0.0");
 
   return (
-    <Card className="p-5">
-      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+    <Card className="p-4">
+      <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
         <div>
-          <h2 className="text-lg font-semibold">Delivered — Shipment vs Estimate</h2>
-          <p className="text-xs text-muted-foreground">
+          <h2 className="text-base font-semibold">Delivered — Shipment vs Estimate</h2>
+          <p className="text-[11px] text-muted-foreground">
             สรุปรวมทั้งปี · เปรียบเทียบ On-time กับ Delay · คลิกที่ชิ้นส่วนเพื่อดูรายละเอียด
           </p>
         </div>
-        <div className="flex flex-wrap gap-2 text-xs">
+        <div className="flex flex-wrap gap-2 text-[11px]">
           {data.map((d) => (
-            <span key={d.key} className="rounded-md border px-2 py-1">
+            <span key={d.key} className="rounded-md border px-2 py-0.5">
               <span
                 className="mr-1 inline-block h-2 w-2 rounded-sm align-middle"
                 style={{ backgroundColor: d.color }}
@@ -1335,7 +1335,7 @@ function DeliveredShipmentChart({
       {total === 0 ? (
         <EmptyState />
       ) : (
-        <div className="h-[340px] w-full">
+        <div className="h-[260px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Tooltip
@@ -1344,17 +1344,18 @@ function DeliveredShipmentChart({
                   border: "1px solid var(--border)",
                   borderRadius: 8,
                   fontFamily: "Kanit",
+                  fontSize: 12,
                 }}
                 labelStyle={{ display: "none" }}
                 formatter={(value: number, name: string) => [`${value.toLocaleString()} รายการ`, name]}
               />
-              <Legend />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
               <Pie
                 data={data as unknown as Array<{ name: string; value: number; color: string; key: string }>}
                 cx="50%"
                 cy="50%"
-                innerRadius={60}
-                outerRadius={100}
+                innerRadius={50}
+                outerRadius={80}
                 dataKey="value"
                 nameKey="name"
                 label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
