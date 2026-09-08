@@ -1096,7 +1096,9 @@ function StatusDrilldownModal({
           <div>
             <h3 className="text-lg font-semibold">Products — {status}</h3>
             <p className="text-xs text-muted-foreground">
-              จำนวน {rows.length.toLocaleString()} รายการที่อยู่ในสถานะนี้ (ตามตัวกรองปัจจุบัน)
+              {rows.length.toLocaleString()} รายการ · รวม QTY{" "}
+              {rows.reduce((s, r) => s + r.Quantity, 0).toLocaleString()} · รวม Revenue{" "}
+              {formatUsd(rows.reduce((s, r) => s + r.Revenue, 0))}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -1140,6 +1142,7 @@ function StatusDrilldownModal({
                   <TableHead className="text-xs font-semibold uppercase tracking-wide">Status</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide">Delivery</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide">Shipment</TableHead>
+                  <TableHead className="text-right text-xs font-semibold uppercase tracking-wide">Revenue</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -1154,6 +1157,7 @@ function StatusDrilldownModal({
                     <TableCell><StatusBadge value={r.Status} /></TableCell>
                     <TableCell><DeliveryBadge value={r.Delivery} /></TableCell>
                     <TableCell className="whitespace-nowrap text-xs">{r.Shipment}</TableCell>
+                    <TableCell className="text-right tabular-nums">{formatUsd(r.Revenue)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
