@@ -496,20 +496,20 @@ function Dashboard() {
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {/* Product Count Chart */}
-          <Card className="p-5">
-            <div className="mb-4 flex items-center justify-between">
+          <Card className="p-4">
+            <div className="mb-3 flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold">Projects Count by Month</h2>
-                <p className="text-xs text-muted-foreground">
+                <h2 className="text-base font-semibold">Projects Count by Month</h2>
+                <p className="text-[11px] text-muted-foreground">
                   จำนวน Project ต่อเดือน ตามตัวกรองที่เลือก · คลิกที่กราฟเพื่อดูรายละเอียด
                 </p>
               </div>
               <div className="flex gap-1 rounded-md border p-0.5">
                 <button
                   onClick={() => setChartType("bar")}
-                  className={`rounded px-3 py-1 text-xs font-medium transition ${
+                  className={`rounded px-2 py-0.5 text-[11px] font-medium transition ${
                     chartType === "bar"
                       ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:text-foreground"
@@ -519,7 +519,7 @@ function Dashboard() {
                 </button>
                 <button
                   onClick={() => setChartType("line")}
-                  className={`rounded px-3 py-1 text-xs font-medium transition ${
+                  className={`rounded px-2 py-0.5 text-[11px] font-medium transition ${
                     chartType === "line"
                       ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:text-foreground"
@@ -532,13 +532,13 @@ function Dashboard() {
             {chartData.length === 0 ? (
               <EmptyState />
             ) : (
-              <div className="h-[340px] w-full">
+              <div className="h-[260px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   {chartType === "bar" ? (
-                    <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }} onClick={(s: { activeLabel?: string }) => { if (s?.activeLabel) setDrillMonth(String(s.activeLabel)); }} style={{ cursor: "pointer" }}>
+                    <BarChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 4 }} onClick={(s: { activeLabel?: string }) => { if (s?.activeLabel) setDrillMonth(String(s.activeLabel)); }} style={{ cursor: "pointer" }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                      <XAxis dataKey="YearMonth" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
-                      <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" domain={[0, Math.max(...chartData.map((d) => d.Count), 1) + 2]} />
+                      <XAxis dataKey="YearMonth" tick={{ fontSize: 11 }} stroke="var(--muted-foreground)" />
+                      <YAxis tick={{ fontSize: 11 }} stroke="var(--muted-foreground)" domain={[0, Math.max(...chartData.map((d) => d.Count), 1) + 2]} />
                       <Tooltip
                         contentStyle={{
                           background: "var(--popover)",
@@ -547,16 +547,16 @@ function Dashboard() {
                           fontFamily: "Kanit",
                         }}
                       />
-                      <Legend />
+                      <Legend wrapperStyle={{ fontSize: 11 }} />
                       <Bar dataKey="Count" name="Projects" fill="var(--chart-1)" radius={[4, 4, 0, 0]}>
-                        <LabelList dataKey="Count" position="top" fontSize={11} fill="var(--foreground)" />
+                        <LabelList dataKey="Count" position="top" fontSize={10} fill="var(--foreground)" />
                       </Bar>
                     </BarChart>
                   ) : (
-                    <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }} onClick={(s: { activeLabel?: string }) => { if (s?.activeLabel) setDrillMonth(String(s.activeLabel)); }} style={{ cursor: "pointer" }}>
+                    <LineChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 4 }} onClick={(s: { activeLabel?: string }) => { if (s?.activeLabel) setDrillMonth(String(s.activeLabel)); }} style={{ cursor: "pointer" }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                      <XAxis dataKey="YearMonth" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
-                      <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" domain={[0, Math.max(...chartData.map((d) => d.Count), 1) + 2]} />
+                      <XAxis dataKey="YearMonth" tick={{ fontSize: 11 }} stroke="var(--muted-foreground)" />
+                      <YAxis tick={{ fontSize: 11 }} stroke="var(--muted-foreground)" domain={[0, Math.max(...chartData.map((d) => d.Count), 1) + 2]} />
                       <Tooltip
                         contentStyle={{
                           background: "var(--popover)",
@@ -565,9 +565,9 @@ function Dashboard() {
                           fontFamily: "Kanit",
                         }}
                       />
-                      <Legend />
+                      <Legend wrapperStyle={{ fontSize: 11 }} />
                       <Line type="monotone" dataKey="Count" name="Projects" stroke="var(--chart-1)" strokeWidth={2} dot={{ r: 3 }}>
-                        <LabelList dataKey="Count" position="top" fontSize={11} fill="var(--foreground)" />
+                        <LabelList dataKey="Count" position="top" fontSize={10} fill="var(--foreground)" />
                       </Line>
                     </LineChart>
                   )}
@@ -581,7 +581,7 @@ function Dashboard() {
         </div>
 
         {/* Delivered & Feedback side by side */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <DeliveredShipmentChart
             rows={deliveredRows}
             onDrill={(status) => {
@@ -1007,17 +1007,17 @@ function StatusPieChart({
   };
 
   return (
-    <Card className="p-5">
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold">Overall status</h2>
-        <p className="text-xs text-muted-foreground">
+    <Card className="p-4">
+      <div className="mb-3">
+        <h2 className="text-base font-semibold">Overall status</h2>
+        <p className="text-[11px] text-muted-foreground">
           สัดส่วนสถานะของ Projects ตามตัวกรองที่เลือก · คลิกที่ชิ้นส่วนเพื่อดูรายละเอียด
         </p>
       </div>
       {data.length === 0 ? (
         <EmptyState />
       ) : (
-        <div className="h-[340px] w-full">
+        <div className="h-[260px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Tooltip
@@ -1026,16 +1026,17 @@ function StatusPieChart({
                   border: "1px solid var(--border)",
                   borderRadius: 8,
                   fontFamily: "Kanit",
+                  fontSize: 12,
                 }}
                 labelStyle={{ display: "none" }}
                 formatter={(value: number, name: string) => [`${value.toLocaleString()} รายการ`, name]}
               />
-              <Legend />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
               <Pie
                 data={data}
                 cx="50%"
                 cy="50%"
-                outerRadius={100}
+                outerRadius={80}
                 dataKey="value"
                 nameKey="name"
                 label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
@@ -1214,10 +1215,10 @@ function FeedbackChart({
   };
 
   return (
-    <Card className="p-5">
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold">Customer Feedback</h2>
-        <p className="text-xs text-muted-foreground">
+    <Card className="p-4">
+      <div className="mb-3">
+        <h2 className="text-base font-semibold">Customer Feedback</h2>
+        <p className="text-[11px] text-muted-foreground">
           สัดส่วน Customer Feedback ตามตัวกรองที่เลือก · คลิกที่ชิ้นส่วนเพื่อดูรายละเอียด
           {totalRevenue > 0 && (
             <span className="ml-1">· รวม Revenue {formatUsd(totalRevenue)}</span>
@@ -1227,7 +1228,7 @@ function FeedbackChart({
       {data.length === 0 ? (
         <EmptyState />
       ) : (
-        <div className="h-[400px] w-full">
+        <div className="h-[280px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Tooltip
@@ -1236,6 +1237,7 @@ function FeedbackChart({
                   border: "1px solid var(--border)",
                   borderRadius: 8,
                   fontFamily: "Kanit",
+                  fontSize: 12,
                 }}
                 labelStyle={{ display: "none" }}
                 formatter={(value: number, name: string, props: { payload?: { revenue?: number } }) => {
@@ -1243,12 +1245,12 @@ function FeedbackChart({
                   return [`${value.toLocaleString()} รายการ · Revenue ${formatUsd(revenue)}`, name];
                 }}
               />
-              <Legend />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
               <Pie
                 data={data}
                 cx="50%"
                 cy="50%"
-                outerRadius={110}
+                outerRadius={85}
                 dataKey="value"
                 nameKey="name"
                 label={renderLabel}
@@ -1310,17 +1312,17 @@ function DeliveredShipmentChart({
   const pct = (v: number) => (total ? ((v / total) * 100).toFixed(1) : "0.0");
 
   return (
-    <Card className="p-5">
-      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+    <Card className="p-4">
+      <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
         <div>
-          <h2 className="text-lg font-semibold">Delivered — Shipment vs Estimate</h2>
-          <p className="text-xs text-muted-foreground">
+          <h2 className="text-base font-semibold">Delivered — Shipment vs Estimate</h2>
+          <p className="text-[11px] text-muted-foreground">
             สรุปรวมทั้งปี · เปรียบเทียบ On-time กับ Delay · คลิกที่ชิ้นส่วนเพื่อดูรายละเอียด
           </p>
         </div>
-        <div className="flex flex-wrap gap-2 text-xs">
+        <div className="flex flex-wrap gap-2 text-[11px]">
           {data.map((d) => (
-            <span key={d.key} className="rounded-md border px-2 py-1">
+            <span key={d.key} className="rounded-md border px-2 py-0.5">
               <span
                 className="mr-1 inline-block h-2 w-2 rounded-sm align-middle"
                 style={{ backgroundColor: d.color }}
@@ -1333,7 +1335,7 @@ function DeliveredShipmentChart({
       {total === 0 ? (
         <EmptyState />
       ) : (
-        <div className="h-[340px] w-full">
+        <div className="h-[260px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Tooltip
@@ -1342,17 +1344,18 @@ function DeliveredShipmentChart({
                   border: "1px solid var(--border)",
                   borderRadius: 8,
                   fontFamily: "Kanit",
+                  fontSize: 12,
                 }}
                 labelStyle={{ display: "none" }}
                 formatter={(value: number, name: string) => [`${value.toLocaleString()} รายการ`, name]}
               />
-              <Legend />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
               <Pie
                 data={data as unknown as Array<{ name: string; value: number; color: string; key: string }>}
                 cx="50%"
                 cy="50%"
-                innerRadius={60}
-                outerRadius={100}
+                innerRadius={50}
+                outerRadius={80}
                 dataKey="value"
                 nameKey="name"
                 label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
