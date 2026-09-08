@@ -496,20 +496,20 @@ function Dashboard() {
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {/* Product Count Chart */}
-          <Card className="p-5">
-            <div className="mb-4 flex items-center justify-between">
+          <Card className="p-4">
+            <div className="mb-3 flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold">Projects Count by Month</h2>
-                <p className="text-xs text-muted-foreground">
+                <h2 className="text-base font-semibold">Projects Count by Month</h2>
+                <p className="text-[11px] text-muted-foreground">
                   จำนวน Project ต่อเดือน ตามตัวกรองที่เลือก · คลิกที่กราฟเพื่อดูรายละเอียด
                 </p>
               </div>
               <div className="flex gap-1 rounded-md border p-0.5">
                 <button
                   onClick={() => setChartType("bar")}
-                  className={`rounded px-3 py-1 text-xs font-medium transition ${
+                  className={`rounded px-2 py-0.5 text-[11px] font-medium transition ${
                     chartType === "bar"
                       ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:text-foreground"
@@ -519,7 +519,7 @@ function Dashboard() {
                 </button>
                 <button
                   onClick={() => setChartType("line")}
-                  className={`rounded px-3 py-1 text-xs font-medium transition ${
+                  className={`rounded px-2 py-0.5 text-[11px] font-medium transition ${
                     chartType === "line"
                       ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:text-foreground"
@@ -532,13 +532,13 @@ function Dashboard() {
             {chartData.length === 0 ? (
               <EmptyState />
             ) : (
-              <div className="h-[340px] w-full">
+              <div className="h-[260px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   {chartType === "bar" ? (
-                    <BarChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }} onClick={(s: { activeLabel?: string }) => { if (s?.activeLabel) setDrillMonth(String(s.activeLabel)); }} style={{ cursor: "pointer" }}>
+                    <BarChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 4 }} onClick={(s: { activeLabel?: string }) => { if (s?.activeLabel) setDrillMonth(String(s.activeLabel)); }} style={{ cursor: "pointer" }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                      <XAxis dataKey="YearMonth" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
-                      <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" domain={[0, Math.max(...chartData.map((d) => d.Count), 1) + 2]} />
+                      <XAxis dataKey="YearMonth" tick={{ fontSize: 11 }} stroke="var(--muted-foreground)" />
+                      <YAxis tick={{ fontSize: 11 }} stroke="var(--muted-foreground)" domain={[0, Math.max(...chartData.map((d) => d.Count), 1) + 2]} />
                       <Tooltip
                         contentStyle={{
                           background: "var(--popover)",
@@ -547,16 +547,16 @@ function Dashboard() {
                           fontFamily: "Kanit",
                         }}
                       />
-                      <Legend />
+                      <Legend wrapperStyle={{ fontSize: 11 }} />
                       <Bar dataKey="Count" name="Projects" fill="var(--chart-1)" radius={[4, 4, 0, 0]}>
-                        <LabelList dataKey="Count" position="top" fontSize={11} fill="var(--foreground)" />
+                        <LabelList dataKey="Count" position="top" fontSize={10} fill="var(--foreground)" />
                       </Bar>
                     </BarChart>
                   ) : (
-                    <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }} onClick={(s: { activeLabel?: string }) => { if (s?.activeLabel) setDrillMonth(String(s.activeLabel)); }} style={{ cursor: "pointer" }}>
+                    <LineChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 4 }} onClick={(s: { activeLabel?: string }) => { if (s?.activeLabel) setDrillMonth(String(s.activeLabel)); }} style={{ cursor: "pointer" }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                      <XAxis dataKey="YearMonth" tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" />
-                      <YAxis tick={{ fontSize: 12 }} stroke="var(--muted-foreground)" domain={[0, Math.max(...chartData.map((d) => d.Count), 1) + 2]} />
+                      <XAxis dataKey="YearMonth" tick={{ fontSize: 11 }} stroke="var(--muted-foreground)" />
+                      <YAxis tick={{ fontSize: 11 }} stroke="var(--muted-foreground)" domain={[0, Math.max(...chartData.map((d) => d.Count), 1) + 2]} />
                       <Tooltip
                         contentStyle={{
                           background: "var(--popover)",
@@ -565,9 +565,9 @@ function Dashboard() {
                           fontFamily: "Kanit",
                         }}
                       />
-                      <Legend />
+                      <Legend wrapperStyle={{ fontSize: 11 }} />
                       <Line type="monotone" dataKey="Count" name="Projects" stroke="var(--chart-1)" strokeWidth={2} dot={{ r: 3 }}>
-                        <LabelList dataKey="Count" position="top" fontSize={11} fill="var(--foreground)" />
+                        <LabelList dataKey="Count" position="top" fontSize={10} fill="var(--foreground)" />
                       </Line>
                     </LineChart>
                   )}
