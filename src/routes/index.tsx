@@ -979,6 +979,28 @@ function EmptyState() {
   );
 }
 
+function PieSliceLabel({
+  name = "",
+  value = 0,
+  percent = 0,
+  x = 0,
+  y = 0,
+  textAnchor = "middle",
+}: {
+  name?: string;
+  value?: number;
+  percent?: number;
+  x?: number;
+  y?: number;
+  textAnchor?: "inherit" | "start" | "middle" | "end";
+}) {
+  return (
+    <text x={x} y={y} textAnchor={textAnchor} fill="var(--foreground)" fontSize={12}>
+      {`${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
+    </text>
+  );
+}
+
 function StatusPieChart({
   rows,
   onDrill,
