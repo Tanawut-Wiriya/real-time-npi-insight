@@ -979,6 +979,28 @@ function EmptyState() {
   );
 }
 
+function PieSliceLabel({
+  name = "",
+  value = 0,
+  percent = 0,
+  x = 0,
+  y = 0,
+  textAnchor = "middle",
+}: {
+  name?: string;
+  value?: number;
+  percent?: number;
+  x?: number;
+  y?: number;
+  textAnchor?: "inherit" | "start" | "middle" | "end";
+}) {
+  return (
+    <text x={x} y={y} textAnchor={textAnchor} fill="var(--foreground)" fontSize={12}>
+      {`${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
+    </text>
+  );
+}
+
 function StatusPieChart({
   rows,
   onDrill,
@@ -1039,7 +1061,7 @@ function StatusPieChart({
                 outerRadius={80}
                 dataKey="value"
                 nameKey="name"
-                label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
+                label={PieSliceLabel}
                 labelLine
                 onClick={(entry: { name?: string }) => {
                   if (onDrill && entry?.name) onDrill(entry.name);
@@ -1205,7 +1227,7 @@ function FeedbackChart({
     const { name = "", value = 0, percent = 0, x = 0, y = 0, textAnchor = "middle" } = props;
     const revenue = data.find((d) => d.name === name)?.revenue ?? 0;
     return (
-      <text x={x} y={y} textAnchor={textAnchor} fill="var(--foreground)" fontSize={14}>
+      <text x={x} y={y} textAnchor={textAnchor} fill="var(--foreground)" fontSize={12}>
         <tspan x={x} dy="-0.2em">{`${name}: ${value} (${(percent * 100).toFixed(0)}%)`}</tspan>
         <tspan x={x} dy="1.2em" fill="var(--muted-foreground)">
           {formatUsd(revenue)}
@@ -1346,7 +1368,7 @@ function DeliveredShipmentChart({
                 outerRadius={80}
                 dataKey="value"
                 nameKey="name"
-                label={({ name, value, percent }) => `${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
+                label={PieSliceLabel}
                 labelLine
               >
                 {data.map((entry) => (
