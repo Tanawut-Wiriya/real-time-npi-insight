@@ -1309,27 +1309,15 @@ function DeliveredShipmentChart({
   }, [rows]);
 
   const total = rows.length;
-  const pct = (v: number) => (total ? ((v / total) * 100).toFixed(1) : "0.0");
 
   return (
     <Card className="p-4">
       <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
         <div>
-          <h2 className="text-base font-semibold">Delivered — Shipment vs Estimate</h2>
+          <h2 className="text-base font-semibold">OTD</h2>
           <p className="text-[11px] text-muted-foreground">
             สรุปรวมทั้งปี · เปรียบเทียบ On-time กับ Delay · คลิกที่ชิ้นส่วนเพื่อดูรายละเอียด
           </p>
-        </div>
-        <div className="flex flex-wrap gap-2 text-[11px]">
-          {data.map((d) => (
-            <span key={d.key} className="rounded-md border px-2 py-0.5">
-              <span
-                className="mr-1 inline-block h-2 w-2 rounded-sm align-middle"
-                style={{ backgroundColor: d.color }}
-              />
-              {d.name} {d.value.toLocaleString()} ({pct(d.value)}%)
-            </span>
-          ))}
         </div>
       </div>
       {total === 0 ? (
