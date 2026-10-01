@@ -498,7 +498,7 @@ function Dashboard() {
         {/* Charts */}
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-4">
           {/* Product Count Chart */}
-          <Card className="flex flex-col self-start p-3">
+          <Card className="flex flex-col p-3">
             <div className="mb-2 flex items-center justify-between">
               <div>
                 <h2 className="text-sm font-semibold">Projects Count by Month</h2>
