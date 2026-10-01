@@ -535,9 +535,9 @@ function Dashboard() {
               <div className="h-[278px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   {chartType === "bar" ? (
-                    <BarChart data={chartData} margin={{ top: 8, right: 4, left: 0, bottom: 4 }} onClick={(s: { activeLabel?: string }) => { if (s?.activeLabel) setDrillMonth(String(s.activeLabel)); }} style={{ cursor: "pointer" }}>
+                    <BarChart data={chartData} margin={{ top: 8, right: 4, left: 0, bottom: 4 }} onClick={(s: { activeTooltipIndex?: number; activeLabel?: string }) => { const k = chartData[s?.activeTooltipIndex ?? -1]?.YearMonth ?? (s?.activeLabel ? String(s.activeLabel) : null); if (k) setDrillMonth(k); }} style={{ cursor: "pointer" }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                      <XAxis dataKey="YearMonth" tick={{ fontSize: 10 }} stroke="var(--muted-foreground)" />
+                      <XAxis dataKey="YearMonth" interval={0} tickFormatter={shortMonthLabel} tick={{ fontSize: 10 }} stroke="var(--muted-foreground)" />
                       <YAxis width={26} tick={{ fontSize: 10 }} stroke="var(--muted-foreground)" domain={[0, Math.max(...chartData.map((d) => d.Count), 1) + 2]} />
                       <Tooltip
                         contentStyle={{
@@ -554,9 +554,9 @@ function Dashboard() {
                       </Bar>
                     </BarChart>
                   ) : (
-                    <LineChart data={chartData} margin={{ top: 8, right: 4, left: 0, bottom: 4 }} onClick={(s: { activeLabel?: string }) => { if (s?.activeLabel) setDrillMonth(String(s.activeLabel)); }} style={{ cursor: "pointer" }}>
+                    <LineChart data={chartData} margin={{ top: 8, right: 4, left: 0, bottom: 4 }} onClick={(s: { activeTooltipIndex?: number; activeLabel?: string }) => { const k = chartData[s?.activeTooltipIndex ?? -1]?.YearMonth ?? (s?.activeLabel ? String(s.activeLabel) : null); if (k) setDrillMonth(k); }} style={{ cursor: "pointer" }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-                      <XAxis dataKey="YearMonth" tick={{ fontSize: 10 }} stroke="var(--muted-foreground)" />
+                      <XAxis dataKey="YearMonth" interval={0} tickFormatter={shortMonthLabel} tick={{ fontSize: 10 }} stroke="var(--muted-foreground)" />
                       <YAxis width={26} tick={{ fontSize: 10 }} stroke="var(--muted-foreground)" domain={[0, Math.max(...chartData.map((d) => d.Count), 1) + 2]} />
                       <Tooltip
                         contentStyle={{
