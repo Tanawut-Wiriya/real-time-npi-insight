@@ -532,7 +532,7 @@ function Dashboard() {
             {chartData.length === 0 ? (
               <EmptyState />
             ) : (
-              <div className="min-h-[240px] w-full flex-1">
+              <div className="min-h-[192px] w-full flex-1">
                 <ResponsiveContainer width="100%" height="100%">
                   {chartType === "bar" ? (
                     <BarChart data={chartData} margin={{ top: 8, right: 4, left: 0, bottom: 4 }} onClick={(s: { activeLabel?: string }) => { if (s?.activeLabel) setDrillMonth(String(s.activeLabel)); }} style={{ cursor: "pointer" }}>
@@ -1039,7 +1039,7 @@ function StatusPieChart({
       {data.length === 0 ? (
         <EmptyState />
       ) : (
-        <div className="h-[260px] w-full">
+        <div className="h-[208px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Tooltip
@@ -1057,8 +1057,8 @@ function StatusPieChart({
               <Pie
                 data={data}
                 cx="50%"
-                cy="50%"
-                outerRadius={80}
+                cy="46%"
+                outerRadius={62}
                 dataKey="value"
                 nameKey="name"
                 label={PieSliceLabel}
@@ -1257,7 +1257,7 @@ function FeedbackChart({
       {data.length === 0 ? (
         <EmptyState />
       ) : (
-        <div className="h-[280px] w-full">
+        <div className="h-[224px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Tooltip
@@ -1278,8 +1278,8 @@ function FeedbackChart({
               <Pie
                 data={data}
                 cx="50%"
-                cy="50%"
-                outerRadius={85}
+                cy="45%"
+                outerRadius={60}
                 dataKey="value"
                 nameKey="name"
                 label={renderLabel}
@@ -1352,7 +1352,7 @@ function DeliveredShipmentChart({
       {total === 0 ? (
         <EmptyState />
       ) : (
-        <div className="h-[260px] w-full">
+        <div className="h-[208px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Tooltip
@@ -1370,9 +1370,9 @@ function DeliveredShipmentChart({
               <Pie
                 data={data as unknown as Array<{ name: string; value: number; color: string; key: string }>}
                 cx="50%"
-                cy="50%"
-                innerRadius={50}
-                outerRadius={80}
+                cy="46%"
+                innerRadius={38}
+                outerRadius={58}
                 dataKey="value"
                 nameKey="name"
                 label={PieSliceLabel}
