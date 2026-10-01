@@ -1057,8 +1057,8 @@ function StatusPieChart({
               <Pie
                 data={data}
                 cx="50%"
-                cy="50%"
-                outerRadius={64}
+                cy="46%"
+                outerRadius={62}
                 dataKey="value"
                 nameKey="name"
                 label={PieSliceLabel}
@@ -1278,8 +1278,8 @@ function FeedbackChart({
               <Pie
                 data={data}
                 cx="50%"
-                cy="50%"
-                outerRadius={68}
+                cy="45%"
+                outerRadius={60}
                 dataKey="value"
                 nameKey="name"
                 label={renderLabel}
@@ -1370,9 +1370,9 @@ function DeliveredShipmentChart({
               <Pie
                 data={data as unknown as Array<{ name: string; value: number; color: string; key: string }>}
                 cx="50%"
-                cy="50%"
-                innerRadius={40}
-                outerRadius={64}
+                cy="46%"
+                innerRadius={38}
+                outerRadius={58}
                 dataKey="value"
                 nameKey="name"
                 label={PieSliceLabel}
