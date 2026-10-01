@@ -1216,6 +1216,13 @@ function FeedbackChart({
 
   const totalRevenue = useMemo(() => data.reduce((s, d) => s + d.revenue, 0), [data]);
 
+  const getFeedbackColor = (name: string) => {
+    const v = name.toLowerCase();
+    if (v.includes("approved")) return "#22c55e";
+    return `var(--chart-${(data.findIndex((d) => d.name === name) % 5) + 1})`;
+  };
+
+
   const renderLabel = (props: {
     name?: string;
     value?: number;
@@ -1285,7 +1292,7 @@ function FeedbackChart({
                 {data.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
-                    fill={`var(--chart-${(index % 5) + 1})`}
+                    fill={getFeedbackColor(entry.name)}
                     onClick={() => onDrill?.(entry.name)}
                   />
                 ))}
