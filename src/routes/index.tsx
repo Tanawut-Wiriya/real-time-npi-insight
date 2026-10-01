@@ -139,6 +139,18 @@ function shipmentStatus(shipment: string, estimate: string): "on-time" | "delay"
   return s.getTime() <= e.getTime() ? "on-time" : "delay";
 }
 
+const MONTHS_SHORT = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+function shortMonthLabel(value: unknown) {
+  const text = String(value ?? "");
+  const month = text.split("-")[1];
+  const idx = Number(month) - 1;
+  return month && idx >= 0 && idx < 12 ? MONTHS_SHORT[idx] : text;
+}
+
 function DashboardPage() {
   const [view, setView] = useState<"npi" | "asml">("npi");
   return (
