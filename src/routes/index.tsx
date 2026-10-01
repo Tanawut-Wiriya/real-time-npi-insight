@@ -498,7 +498,7 @@ function Dashboard() {
         {/* Charts */}
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-4">
           {/* Product Count Chart */}
-          <Card className="p-3">
+          <Card className="flex h-full flex-col p-3">
             <div className="mb-2 flex items-center justify-between">
               <div>
                 <h2 className="text-sm font-semibold">Projects Count by Month</h2>
@@ -532,13 +532,13 @@ function Dashboard() {
             {chartData.length === 0 ? (
               <EmptyState />
             ) : (
-              <div className="h-[240px] w-full">
+              <div className="min-h-[240px] w-full flex-1">
                 <ResponsiveContainer width="100%" height="100%">
                   {chartType === "bar" ? (
-                    <BarChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 4 }} onClick={(s: { activeLabel?: string }) => { if (s?.activeLabel) setDrillMonth(String(s.activeLabel)); }} style={{ cursor: "pointer" }}>
+                    <BarChart data={chartData} margin={{ top: 8, right: 4, left: 0, bottom: 4 }} onClick={(s: { activeLabel?: string }) => { if (s?.activeLabel) setDrillMonth(String(s.activeLabel)); }} style={{ cursor: "pointer" }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                       <XAxis dataKey="YearMonth" tick={{ fontSize: 10 }} stroke="var(--muted-foreground)" />
-                      <YAxis tick={{ fontSize: 10 }} stroke="var(--muted-foreground)" domain={[0, Math.max(...chartData.map((d) => d.Count), 1) + 2]} />
+                      <YAxis width={26} tick={{ fontSize: 10 }} stroke="var(--muted-foreground)" domain={[0, Math.max(...chartData.map((d) => d.Count), 1) + 2]} />
                       <Tooltip
                         contentStyle={{
                           background: "var(--popover)",
@@ -554,10 +554,10 @@ function Dashboard() {
                       </Bar>
                     </BarChart>
                   ) : (
-                    <LineChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 4 }} onClick={(s: { activeLabel?: string }) => { if (s?.activeLabel) setDrillMonth(String(s.activeLabel)); }} style={{ cursor: "pointer" }}>
+                    <LineChart data={chartData} margin={{ top: 8, right: 4, left: 0, bottom: 4 }} onClick={(s: { activeLabel?: string }) => { if (s?.activeLabel) setDrillMonth(String(s.activeLabel)); }} style={{ cursor: "pointer" }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                       <XAxis dataKey="YearMonth" tick={{ fontSize: 10 }} stroke="var(--muted-foreground)" />
-                      <YAxis tick={{ fontSize: 10 }} stroke="var(--muted-foreground)" domain={[0, Math.max(...chartData.map((d) => d.Count), 1) + 2]} />
+                      <YAxis width={26} tick={{ fontSize: 10 }} stroke="var(--muted-foreground)" domain={[0, Math.max(...chartData.map((d) => d.Count), 1) + 2]} />
                       <Tooltip
                         contentStyle={{
                           background: "var(--popover)",
