@@ -498,7 +498,7 @@ function Dashboard() {
         {/* Charts */}
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-4">
           {/* Product Count Chart */}
-          <Card className="flex flex-col self-start p-3">
+          <Card className="flex flex-col p-3">
             <div className="mb-2 flex items-center justify-between">
               <div>
                 <h2 className="text-sm font-semibold">Projects Count by Month</h2>
@@ -532,7 +532,7 @@ function Dashboard() {
             {chartData.length === 0 ? (
               <EmptyState />
             ) : (
-              <div className="h-[192px] w-full">
+              <div className="h-[278px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   {chartType === "bar" ? (
                     <BarChart data={chartData} margin={{ top: 8, right: 4, left: 0, bottom: 4 }} onClick={(s: { activeLabel?: string }) => { if (s?.activeLabel) setDrillMonth(String(s.activeLabel)); }} style={{ cursor: "pointer" }}>
