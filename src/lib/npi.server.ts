@@ -124,7 +124,9 @@ export async function fetchNpiData(): Promise<NpiRow[]> {
     Plan: formatDate(pick(r, "Production plan", "production plan", "Plan", "productionPlan")),
     CustomerFeedback: String(
       pick(r, "Customer feedback", "CustomerFeedback", "customerFeedback") ?? "",
-    ).trim(),
+    )
+      .replace(/^[:\s]+/, "")
+      .trim(),
     Remark: String(pick(r, "Remark", "remark") ?? "").trim(),
     Revenue:
       Number(
