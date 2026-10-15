@@ -14,6 +14,7 @@ export interface NpiRow {
   Plan: string;
   CustomerFeedback: string;
   Remark: string;
+  FeedbackRemark: string;
   EstimateShipment: string;
   Shipment: string;
   Revenue: number;

@@ -128,6 +128,9 @@ export async function fetchNpiData(): Promise<NpiRow[]> {
       .replace(/^[:\s]+/, "")
       .trim(),
     Remark: String(pick(r, "Remark", "remark") ?? "").trim(),
+    FeedbackRemark: String(
+      pick(r, "Remark customer feedback", "RemarkCustomerFeedback", "remarkCustomerFeedback") ?? "",
+    ).trim(),
     Revenue:
       Number(
         String(pick(r, "Revenue", "revenue") ?? "0").replace(/[,฿$ ]/g, ""),

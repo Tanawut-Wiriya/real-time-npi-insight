@@ -630,6 +630,7 @@ function Dashboard() {
         <StatusDrilldownModal
           status="Wait Approval (w.customer)"
           rows={waitApprovalRows}
+          showFeedbackRemark
           onClose={() => setShowWaitApproval(false)}
         />
       )}
@@ -1100,10 +1101,12 @@ function StatusDrilldownModal({
   status,
   rows,
   onClose,
+  showFeedbackRemark = false,
 }: {
   status: string;
   rows: NpiRow[];
   onClose: () => void;
+  showFeedbackRemark?: boolean;
 }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -1178,6 +1181,9 @@ function StatusDrilldownModal({
                   <TableHead className="text-xs font-semibold uppercase tracking-wide">Delivery</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide">Shipment</TableHead>
                   <TableHead className="text-right text-xs font-semibold uppercase tracking-wide">Revenue</TableHead>
+                  {showFeedbackRemark && (
+                    <TableHead className="text-xs font-semibold uppercase tracking-wide">Remark customer feedback</TableHead>
+                  )}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -1193,6 +1199,11 @@ function StatusDrilldownModal({
                     <TableCell><DeliveryBadge value={r.Delivery} /></TableCell>
                     <TableCell className="whitespace-nowrap text-xs">{r.Shipment}</TableCell>
                     <TableCell className="text-right tabular-nums">{formatUsd(r.Revenue)}</TableCell>
+                    {showFeedbackRemark && (
+                      <TableCell className="max-w-[220px] truncate text-xs" title={r.FeedbackRemark}>
+                        {r.FeedbackRemark || "-"}
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>
