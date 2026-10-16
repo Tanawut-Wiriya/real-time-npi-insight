@@ -30,9 +30,12 @@ import {
   LineChart as LineIcon,
   Loader2,
   Package,
+  Pencil,
   RefreshCw,
+  Save,
   Truck,
   Wrench,
+  X,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import { getNpiData, getAsmlData, type NpiRow, type AsmlRow } from "@/lib/npi.functions";
@@ -54,6 +57,8 @@ import {
 } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 const npiQuery = queryOptions({
   queryKey: ["npi-data"],
@@ -1108,6 +1113,10 @@ function StatusDrilldownModal({
   onClose: () => void;
   showFeedbackRemark?: boolean;
 }) {
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [feedbackDraft, setFeedbackDraft] = useState("");
+  const [remarkDraft, setRemarkDraft] = useState("");
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -1128,6 +1137,9 @@ function StatusDrilldownModal({
     >
       <div
         className="relative flex max-h-[85vh] w-full max-w-5xl flex-col overflow-hidden rounded-lg border bg-card shadow-lg"
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Products — ${status}`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between border-b px-5 py-4">
@@ -1164,6 +1176,11 @@ function StatusDrilldownModal({
           </button>
           </div>
         </div>
+        {showFeedbackRemark && editingIndex !== null && (
+          <p role="status" className="border-b px-5 py-3 text-xs text-muted-foreground">
+            ยังบันทึกกลับ Google Sheet ไม่ได้: ต้องเชื่อมต่อการรับข้อมูลและตรวจสอบสิทธิ์ใน Google Apps Script ก่อน
+          </p>
+        )}
         <div className="overflow-auto">
           {rows.length === 0 ? (
             <div className="p-10"><EmptyState /></div>
@@ -1178,16 +1195,19 @@ function StatusDrilldownModal({
                   <TableHead className="text-right text-xs font-semibold uppercase tracking-wide">QTY.</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide">Start Date</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide">Status</TableHead>
-                  <TableHead className="text-xs font-semibold uppercase tracking-wide">Delivery</TableHead>
+                  <TableHead className="text-xs font-semibold uppercase tracking-wide">{showFeedbackRemark ? "Approval" : "Delivery"}</TableHead>
                   <TableHead className="text-xs font-semibold uppercase tracking-wide">Shipment</TableHead>
                   <TableHead className="text-right text-xs font-semibold uppercase tracking-wide">Revenue</TableHead>
                   {showFeedbackRemark && (
-                    <TableHead className="text-xs font-semibold uppercase tracking-wide">Remark customer feedback</TableHead>
+                    <>
+                      <TableHead className="text-xs font-semibold uppercase tracking-wide">Remark customer feedback</TableHead>
+                      <TableHead className="text-xs font-semibold uppercase tracking-wide">แก้ไข</TableHead>
+                    </>
                   )}
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {rows.map((r) => (
+                {rows.map((r, index) => (
                   <TableRow key={r.No} className="text-sm">
                     <TableCell className="font-mono text-xs text-muted-foreground">{r.No}</TableCell>
                     <TableCell className="font-medium">{r.Product}</TableCell>
@@ -1196,13 +1216,58 @@ function StatusDrilldownModal({
                     <TableCell className="text-right tabular-nums">{r.Quantity.toLocaleString()}</TableCell>
                     <TableCell className="whitespace-nowrap">{r.YearMonth}</TableCell>
                     <TableCell><StatusBadge value={r.Status} /></TableCell>
-                    <TableCell><DeliveryBadge value={r.Delivery} /></TableCell>
+                    <TableCell>
+                      {showFeedbackRemark ? (
+                        editingIndex === index ? (
+                          <Input
+                            aria-label={`Customer feedback แถว ${r.No}`}
+                            value={feedbackDraft}
+                            onChange={(e) => setFeedbackDraft(e.target.value)}
+                            maxLength={200}
+                            className="min-w-40"
+                            autoFocus
+                          />
+                        ) : (
+                          <Badge variant="outline">{r.CustomerFeedback || "-"}</Badge>
+                        )
+                      ) : <DeliveryBadge value={r.Delivery} />}
+                    </TableCell>
                     <TableCell className="whitespace-nowrap text-xs">{r.Shipment}</TableCell>
                     <TableCell className="text-right tabular-nums">{formatUsd(r.Revenue)}</TableCell>
                     {showFeedbackRemark && (
-                      <TableCell className="max-w-[220px] truncate text-xs" title={r.FeedbackRemark}>
-                        {r.FeedbackRemark || "-"}
-                      </TableCell>
+                      <>
+                        <TableCell className="max-w-[220px] text-xs" title={r.FeedbackRemark}>
+                          {editingIndex === index ? (
+                            <Textarea
+                              aria-label={`Remark customer feedback แถว ${r.No}`}
+                              value={remarkDraft}
+                              onChange={(e) => setRemarkDraft(e.target.value)}
+                              maxLength={5000}
+                              className="min-w-52"
+                            />
+                          ) : <span className="block truncate">{r.FeedbackRemark || "-"}</span>}
+                        </TableCell>
+                        <TableCell>
+                          {editingIndex === index ? (
+                            <div className="flex items-center gap-1">
+                              <Button variant="outline" size="icon" disabled aria-label={`บันทึกแถว ${r.No}`} title="ยังไม่ได้เชื่อมต่อการบันทึกกลับ Google Sheet">
+                                <Save className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="icon" aria-label={`ยกเลิกแถว ${r.No}`} title="ยกเลิก" onClick={() => setEditingIndex(null)}>
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <Button variant="ghost" size="icon" aria-label={`แก้ไขแถว ${r.No}`} title="แก้ไข Customer feedback และ Remark customer feedback" onClick={() => {
+                              setEditingIndex(index);
+                              setFeedbackDraft(r.CustomerFeedback);
+                              setRemarkDraft(r.FeedbackRemark);
+                            }}>
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </TableCell>
+                      </>
                     )}
                   </TableRow>
                 ))}
