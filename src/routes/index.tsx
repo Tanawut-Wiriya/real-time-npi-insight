@@ -687,6 +687,7 @@ function Dashboard() {
         <StatusDrilldownModal
           status={`Feedback: ${drillFeedback}`}
           rows={drillFeedbackRows}
+          showFeedbackRemark
           onClose={() => setDrillFeedback(null)}
         />
       )}
@@ -1169,7 +1170,7 @@ function StatusDrilldownModal({
       onClick={() => { if (!saving && !confirmOpen) onClose(); }}
     >
       <div
-        className="relative flex max-h-[85vh] w-full max-w-5xl flex-col overflow-hidden rounded-lg border bg-card shadow-lg"
+        className={`relative flex max-h-[85vh] w-full ${showFeedbackRemark ? "max-w-[96vw]" : "max-w-5xl"} flex-col overflow-hidden rounded-lg border bg-card shadow-lg`}
         role="dialog"
         aria-modal="true"
         aria-label={`Products — ${status}`}
