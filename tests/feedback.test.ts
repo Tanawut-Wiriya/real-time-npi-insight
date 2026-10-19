@@ -1,7 +1,7 @@
 /// <reference types="bun" />
 import { afterEach, describe, expect, mock, test } from "bun:test";
-import { validateFeedbackUpdate } from "./feedback.schema";
-import { saveFeedback } from "./feedback.server";
+import { validateFeedbackUpdate } from "../src/lib/feedback.schema";
+import { saveFeedback } from "../src/lib/feedback.server";
 
 const input = { no: 1, token: "test-only-passcode", updates: {
   "Customer feedback": "Approved",
