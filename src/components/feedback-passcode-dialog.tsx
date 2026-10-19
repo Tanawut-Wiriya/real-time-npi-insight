@@ -15,7 +15,11 @@ export function FeedbackPasscodeDialog({ open, no, busy, error, onCancel, onConf
   const [token, setToken] = useState("");
   return (
     <Dialog open={open} onOpenChange={(next) => { if (!next && !busy) { setToken(""); onCancel(); } }}>
-      <DialogContent className="max-w-sm" onEscapeKeyDown={(event) => { if (busy) event.preventDefault(); }} onInteractOutside={(event) => { if (busy) event.preventDefault(); }}>
+      <DialogContent className="max-w-sm" onClick={(event) => event.stopPropagation()} onEscapeKeyDown={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!busy) { setToken(""); onCancel(); }
+      }} onInteractOutside={(event) => { if (busy) event.preventDefault(); }}>
         <DialogHeader>
           <DialogTitle>ยืนยันการบันทึกแถว {no}</DialogTitle>
           <DialogDescription>Customer feedback · Remark customer feedback</DialogDescription>
