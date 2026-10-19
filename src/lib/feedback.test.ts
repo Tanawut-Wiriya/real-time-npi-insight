@@ -1,3 +1,4 @@
+/// <reference types="bun" />
 import { afterEach, describe, expect, mock, test } from "bun:test";
 import { validateFeedbackUpdate } from "./feedback.schema";
 import { saveFeedback } from "./feedback.server";
