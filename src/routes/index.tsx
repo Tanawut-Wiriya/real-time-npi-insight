@@ -1,5 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { queryOptions, useQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { updateCustomerFeedback } from "@/lib/feedback.functions";
+import { FeedbackPasscodeDialog } from "@/components/feedback-passcode-dialog";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Bar,
@@ -1116,10 +1119,40 @@ function StatusDrilldownModal({
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [feedbackDraft, setFeedbackDraft] = useState("");
   const [remarkDraft, setRemarkDraft] = useState("");
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [saveNotice, setSaveNotice] = useState("");
+  const queryClient = useQueryClient();
+  const saveFeedback = useServerFn(updateCustomerFeedback);
+  const editingRow = editingIndex === null ? undefined : rows[editingIndex];
+
+  async function confirmSave(token: string) {
+    if (!showFeedbackRemark || !editingRow || saving) return;
+    setSaving(true);
+    setSaveError("");
+    try {
+      const result = await saveFeedback({ data: { no: editingRow.No, token, updates: {
+        "Customer feedback": feedbackDraft,
+        "Remark customer feedback": remarkDraft,
+      } } });
+      if (!result.ok) { setSaveError(result.message); return; }
+      setConfirmOpen(false);
+      setEditingIndex(null);
+      setFeedbackDraft("");
+      setRemarkDraft("");
+      setSaveNotice(`บันทึกแถว ${editingRow.No} และตรวจสอบข้อมูลจาก Google Sheet แล้ว`);
+      await queryClient.invalidateQueries({ queryKey: ["npi-data"] });
+    } catch {
+      setSaveError("ยังยืนยันการบันทึกไม่ได้ กรุณารีเฟรชเพื่อตรวจสอบข้อมูลก่อนลองใหม่");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape" && !confirmOpen && !saving) onClose();
     };
     window.addEventListener("keydown", onKey);
     const prev = document.body.style.overflow;
@@ -1128,12 +1161,12 @@ function StatusDrilldownModal({
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
     };
-  }, [onClose]);
+  }, [onClose, confirmOpen, saving]);
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-      onClick={onClose}
+      onClick={() => { if (!saving && !confirmOpen) onClose(); }}
     >
       <div
         className="relative flex max-h-[85vh] w-full max-w-5xl flex-col overflow-hidden rounded-lg border bg-card shadow-lg"
@@ -1167,18 +1200,21 @@ function StatusDrilldownModal({
               <FileSpreadsheet className="h-4 w-4" />
               Export Excel
             </Button>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
+            disabled={saving}
             onClick={onClose}
             aria-label="Close"
             className="rounded-md p-1.5 text-muted-foreground transition hover:bg-muted hover:text-foreground"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-          </button>
+          </Button>
           </div>
         </div>
-        {showFeedbackRemark && editingIndex !== null && (
+        {showFeedbackRemark && saveNotice && (
           <p role="status" className="border-b px-5 py-3 text-xs text-muted-foreground">
-            ยังบันทึกกลับ Google Sheet ไม่ได้: ต้องเชื่อมต่อการรับข้อมูลและตรวจสอบสิทธิ์ใน Google Apps Script ก่อน
+            {saveNotice}
           </p>
         )}
         <div className="overflow-auto">
@@ -1250,15 +1286,16 @@ function StatusDrilldownModal({
                         <TableCell>
                           {editingIndex === index ? (
                             <div className="flex items-center gap-1">
-                              <Button variant="outline" size="icon" disabled aria-label={`บันทึกแถว ${r.No}`} title="ยังไม่ได้เชื่อมต่อการบันทึกกลับ Google Sheet">
+                              <Button variant="outline" size="icon" disabled={saving} aria-label={`บันทึกแถว ${r.No}`} title="บันทึก" onClick={() => { setSaveError(""); setConfirmOpen(true); }}>
                                 <Save className="h-4 w-4" />
                               </Button>
-                              <Button variant="ghost" size="icon" aria-label={`ยกเลิกแถว ${r.No}`} title="ยกเลิก" onClick={() => setEditingIndex(null)}>
+                              <Button variant="ghost" size="icon" disabled={saving} aria-label={`ยกเลิกแถว ${r.No}`} title="ยกเลิก" onClick={() => { setEditingIndex(null); setFeedbackDraft(""); setRemarkDraft(""); }}>
                                 <X className="h-4 w-4" />
                               </Button>
                             </div>
                           ) : (
                             <Button variant="ghost" size="icon" aria-label={`แก้ไขแถว ${r.No}`} title="แก้ไข Customer feedback และ Remark customer feedback" onClick={() => {
+                              setSaveNotice("");
                               setEditingIndex(index);
                               setFeedbackDraft(r.CustomerFeedback);
                               setRemarkDraft(r.FeedbackRemark);
@@ -1276,6 +1313,9 @@ function StatusDrilldownModal({
           )}
         </div>
       </div>
+      {showFeedbackRemark && confirmOpen && editingRow && (
+        <FeedbackPasscodeDialog open no={editingRow.No} busy={saving} error={saveError} onCancel={() => { setConfirmOpen(false); setSaveError(""); }} onConfirm={confirmSave} />
+      )}
     </div>
   );
 }

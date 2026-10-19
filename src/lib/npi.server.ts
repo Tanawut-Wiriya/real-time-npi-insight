@@ -1,6 +1,6 @@
 import type { AsmlRow, NpiRow } from "./npi.types";
 
-const DATA_URL =
+export const DATA_URL =
   "https://script.google.com/macros/s/AKfycbwuQCRSkSzCm1JwixbYbJOQNAWRudA1CgI_vQGeA20VdoOFAwXnesyaoui6zG88n7P5gA/exec";
 const TZ_OFFSET_MS = 7 * 60 * 60 * 1000;
 
