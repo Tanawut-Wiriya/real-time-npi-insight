@@ -1273,7 +1273,7 @@ function StatusDrilldownModal({
                     <TableCell className="text-right tabular-nums">{formatUsd(r.Revenue)}</TableCell>
                     {showFeedbackRemark && (
                       <>
-                        <TableCell className="max-w-[220px] text-xs" title={r.FeedbackRemark}>
+                        <TableCell className="max-w-[220px] whitespace-normal text-xs" title={r.FeedbackRemark}>
                           {editingIndex === index ? (
                             <Textarea
                               aria-label={`Remark customer feedback แถว ${r.No}`}
@@ -1282,7 +1282,7 @@ function StatusDrilldownModal({
                               maxLength={5000}
                               className="min-w-52"
                             />
-                          ) : <span className="block truncate">{r.FeedbackRemark || "-"}</span>}
+                            ) : <span className="block whitespace-normal [overflow-wrap:anywhere]">{r.FeedbackRemark || "-"}</span>}
                         </TableCell>
                         <TableCell>
                           {editingIndex === index ? (
