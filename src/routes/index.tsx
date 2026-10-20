@@ -1256,14 +1256,15 @@ function StatusDrilldownModal({
                     <TableCell>
                       {showFeedbackRemark ? (
                         editingIndex === index ? (
-                          <Input
-                            aria-label={`Customer feedback แถว ${r.No}`}
-                            value={feedbackDraft}
-                            onChange={(e) => setFeedbackDraft(e.target.value)}
-                            maxLength={200}
-                            className="min-w-40"
-                            autoFocus
-                          />
+                          <Select value={["W.Customer", "Approved"].includes(feedbackDraft) ? feedbackDraft : undefined} onValueChange={setFeedbackDraft}>
+                            <SelectTrigger aria-label={`Customer feedback แถว ${r.No}`} className="min-w-40">
+                              <SelectValue placeholder="เลือกสถานะ" />
+                            </SelectTrigger>
+                            <SelectContent className="z-[300]">
+                              <SelectItem value="W.Customer">W.Customer</SelectItem>
+                              <SelectItem value="Approved">Approved</SelectItem>
+                            </SelectContent>
+                          </Select>
                         ) : (
                           <Badge variant="outline">{r.CustomerFeedback || "-"}</Badge>
                         )
