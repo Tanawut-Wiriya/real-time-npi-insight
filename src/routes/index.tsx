@@ -1084,16 +1084,15 @@ function StatusPieChart({
                 labelStyle={{ display: "none" }}
                 formatter={(value: number, name: string) => [`${value.toLocaleString()} รายการ`, name]}
               />
-              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Legend layout="vertical" align="right" verticalAlign="middle" wrapperStyle={{ fontSize: 11, width: "48%", lineHeight: "18px" }}
+                formatter={(name: string) => { const tot = data.reduce((s, x) => s + x.value, 0); const v = data.find((x) => x.name === name)?.value ?? 0; return <span style={{ color: "var(--foreground)" }}>{name}: {v} ({tot ? Math.round((v / tot) * 100) : 0}%)</span>; }} />
               <Pie
                 data={data}
-                cx="50%"
+                cx="25%"
                 cy="50%"
-                outerRadius={80}
+                outerRadius={70}
                 dataKey="value"
                 nameKey="name"
-                label={PieSliceLabel}
-                labelLine
                 onClick={(entry: { name?: string }) => {
                   if (onDrill && entry?.name) onDrill(entry.name);
                 }}
@@ -1414,16 +1413,15 @@ function FeedbackChart({
                   return [`${value.toLocaleString()} รายการ · Revenue ${formatUsd(revenue)}`, name];
                 }}
               />
-              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Legend layout="vertical" align="right" verticalAlign="middle" wrapperStyle={{ fontSize: 11, width: "52%", lineHeight: "16px" }}
+                formatter={(name: string) => { const d = data.find((x) => x.name === name); const tot = data.reduce((s, x) => s + x.value, 0); const v = d?.value ?? 0; return <span style={{ color: "var(--foreground)", display: "inline-block", verticalAlign: "top", marginBottom: 4 }}>{name}: {v} ({tot ? Math.round((v / tot) * 100) : 0}%)<br /><span style={{ color: "var(--muted-foreground)" }}>{formatUsd(d?.revenue ?? 0)}</span></span>; }} />
               <Pie
                 data={data}
-                cx="50%"
+                cx="24%"
                 cy="50%"
-                outerRadius={85}
+                outerRadius={70}
                 dataKey="value"
                 nameKey="name"
-                label={renderLabel}
-                labelLine
                 onClick={(entry: { name?: string }) => {
                   if (onDrill && entry?.name) onDrill(entry.name);
                 }}
@@ -1506,17 +1504,16 @@ function DeliveredShipmentChart({
                 labelStyle={{ display: "none" }}
                 formatter={(value: number, name: string) => [`${value.toLocaleString()} รายการ`, name]}
               />
-              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Legend layout="vertical" align="right" verticalAlign="middle" wrapperStyle={{ fontSize: 11, width: "48%", lineHeight: "18px" }}
+                formatter={(name: string) => { const d = data.find((x) => x.name === name); const v = d?.value ?? 0; return <span style={{ color: "var(--foreground)" }}>{name}: {v} ({total ? Math.round((v / total) * 100) : 0}%)</span>; }} />
               <Pie
                 data={data as unknown as Array<{ name: string; value: number; color: string; key: string }>}
-                cx="50%"
+                cx="25%"
                 cy="50%"
-                innerRadius={50}
-                outerRadius={80}
+                innerRadius={40}
+                outerRadius={70}
                 dataKey="value"
                 nameKey="name"
-                label={PieSliceLabel}
-                labelLine
               >
                 {data.map((entry) => (
                   <Cell
