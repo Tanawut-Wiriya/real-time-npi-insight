@@ -1088,9 +1088,9 @@ function StatusPieChart({
                 formatter={(name: string) => { const tot = data.reduce((s, x) => s + x.value, 0); const v = data.find((x) => x.name === name)?.value ?? 0; return <span style={{ color: "var(--foreground)" }}>{name}: {v} ({tot ? Math.round((v / tot) * 100) : 0}%)</span>; }} />
               <Pie
                 data={data}
-                cx={80}
+                cx={68}
                 cy="50%"
-                outerRadius={68}
+                outerRadius={60}
                 dataKey="value"
                 nameKey="name"
                 onClick={(entry: { name?: string }) => {
@@ -1417,9 +1417,9 @@ function FeedbackChart({
                 formatter={(name: string) => { const d = data.find((x) => x.name === name); const tot = data.reduce((s, x) => s + x.value, 0); const v = d?.value ?? 0; return <span style={{ color: "var(--foreground)", display: "inline-block", verticalAlign: "top", marginBottom: 4 }}>{name}: {v} ({tot ? Math.round((v / tot) * 100) : 0}%)<br /><span style={{ color: "var(--muted-foreground)" }}>{formatUsd(d?.revenue ?? 0)}</span></span>; }} />
               <Pie
                 data={data}
-                cx={80}
+                cx={68}
                 cy="50%"
-                outerRadius={70}
+                outerRadius={60}
                 dataKey="value"
                 nameKey="name"
                 onClick={(entry: { name?: string }) => {
@@ -1508,10 +1508,10 @@ function DeliveredShipmentChart({
                 formatter={(name: string) => { const d = data.find((x) => x.name === name); const v = d?.value ?? 0; return <span style={{ color: "var(--foreground)" }}>{name}: {v} ({total ? Math.round((v / total) * 100) : 0}%)</span>; }} />
               <Pie
                 data={data as unknown as Array<{ name: string; value: number; color: string; key: string }>}
-                cx={80}
+                cx={68}
                 cy="50%"
-                innerRadius={40}
-                outerRadius={70}
+                innerRadius={34}
+                outerRadius={60}
                 dataKey="value"
                 nameKey="name"
               >
