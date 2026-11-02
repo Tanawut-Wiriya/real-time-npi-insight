@@ -58,6 +58,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
+const APPROVAL_OPTIONS = [
+  "W.Customer",
+  "Approved",
+  "Approved with condition",
+  "Update version",
+  "Reject",
+  "Stop Business",
+];
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
