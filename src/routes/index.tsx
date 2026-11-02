@@ -1027,7 +1027,8 @@ function PieSliceLabel({
 }) {
   return (
     <text x={x} y={y} textAnchor={textAnchor} fill="var(--foreground)" fontSize={12}>
-      {`${name}: ${value} (${(percent * 100).toFixed(0)}%)`}
+      <tspan x={x} dy="-0.3em">{name}</tspan>
+      <tspan x={x} dy="1.15em">{`${value.toLocaleString()} (${(percent * 100).toFixed(0)}%)`}</tspan>
     </text>
   );
 }
@@ -1375,8 +1376,9 @@ function FeedbackChart({
     const revenue = data.find((d) => d.name === name)?.revenue ?? 0;
     return (
       <text x={x} y={y} textAnchor={textAnchor} fill="var(--foreground)" fontSize={12}>
-        <tspan x={x} dy="-0.2em">{`${name}: ${value} (${(percent * 100).toFixed(0)}%)`}</tspan>
-        <tspan x={x} dy="1.2em" fill="var(--muted-foreground)">
+        <tspan x={x} dy="-0.3em">{name}</tspan>
+        <tspan x={x} dy="1.15em">{`${value.toLocaleString()} (${(percent * 100).toFixed(0)}%)`}</tspan>
+        <tspan x={x} dy="1.15em" fill="var(--muted-foreground)">
           {formatUsd(revenue)}
         </tspan>
       </text>
