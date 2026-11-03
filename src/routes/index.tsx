@@ -1379,8 +1379,11 @@ function FeedbackChart({
     if (data.length > 0 && name === data[0].name) placedLabels = [];
     const revenue = data.find((d) => d.name === name)?.revenue ?? 0;
     const shortName = name.length > 14 ? `${name.slice(0, 13)}…` : name;
+    const isRight = textAnchor === "start";
     const conflicts = (yy: number) =>
-      placedLabels.some((p) => Math.abs(p.x - x) < 200 && Math.abs(p.y - yy) < LABEL_GAP);
+      placedLabels.some(
+        (p) => p.right === isRight && Math.abs(p.x - x) < 50 && Math.abs(p.y - yy) < LABEL_GAP,
+      );
     let ly = y;
     if (conflicts(ly)) {
       for (let k = 1; k <= 10; k++) {
