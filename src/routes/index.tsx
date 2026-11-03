@@ -1089,9 +1089,9 @@ function StatusPieChart({
               <Legend wrapperStyle={{ fontSize: 11 }} />
               <Pie
                 data={data}
-                cx="50%"
+                cx="46%"
                 cy="50%"
-                outerRadius={72}
+                outerRadius={60}
                 dataKey="value"
                 nameKey="name"
                 label={PieSliceLabel}
@@ -1365,6 +1365,8 @@ function FeedbackChart({
   };
 
 
+  let placedLabels: { x: number; y: number }[] = [];
+  const LABEL_GAP = 40;
   const renderLabel = (props: {
     name?: string;
     value?: number;
@@ -1374,16 +1376,29 @@ function FeedbackChart({
     textAnchor?: "inherit" | "start" | "middle" | "end";
   }) => {
     const { name = "", value = 0, percent = 0, x = 0, y = 0, textAnchor = "middle" } = props;
-      const revenue = data.find((d) => d.name === name)?.revenue ?? 0;
-      const shortName = name.length > 14 ? `${name.slice(0, 13)}…` : name;
-      return (
-        <text x={x} y={y} textAnchor={textAnchor} fill="var(--foreground)" fontSize={11}>
-          <tspan x={x} dy="-0.3em">{shortName}</tspan>
-          <tspan x={x} dy="1.15em">{`${value.toLocaleString()} (${(percent * 100).toFixed(0)}%)`}</tspan>
-          <tspan x={x} dy="1.15em" fill="var(--muted-foreground)">
-            {formatUsd(revenue)}
-          </tspan>
-        </text>
+    if (data.length > 0 && name === data[0].name) placedLabels = [];
+    const revenue = data.find((d) => d.name === name)?.revenue ?? 0;
+    const shortName = name.length > 14 ? `${name.slice(0, 13)}…` : name;
+    const conflicts = (yy: number) =>
+      placedLabels.some((p) => Math.abs(p.x - x) < 200 && Math.abs(p.y - yy) < LABEL_GAP);
+    let ly = y;
+    if (conflicts(ly)) {
+      for (let k = 1; k <= 10; k++) {
+        const down = y + k * LABEL_GAP;
+        if (down <= 250 && !conflicts(down)) { ly = down; break; }
+        const up = y - k * LABEL_GAP;
+        if (up >= 12 && !conflicts(up)) { ly = up; break; }
+      }
+    }
+    placedLabels.push({ x, y: ly });
+    return (
+      <text x={x} y={ly} textAnchor={textAnchor} fill="var(--foreground)" fontSize={11}>
+        <tspan x={x} dy="-0.3em">{shortName}</tspan>
+        <tspan x={x} dy="1.15em">{`${value.toLocaleString()} (${(percent * 100).toFixed(0)}%)`}</tspan>
+        <tspan x={x} dy="1.15em" fill="var(--muted-foreground)">
+          {formatUsd(revenue)}
+        </tspan>
+      </text>
       );
   };
 
@@ -1421,9 +1436,9 @@ function FeedbackChart({
               <Legend wrapperStyle={{ fontSize: 11 }} />
               <Pie
                 data={data}
-                cx="50%"
+                cx="46%"
                 cy="50%"
-                outerRadius={74}
+                outerRadius={60}
                 dataKey="value"
                 nameKey="name"
                 label={renderLabel}
