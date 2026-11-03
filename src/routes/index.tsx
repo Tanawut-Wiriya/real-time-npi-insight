@@ -1379,10 +1379,16 @@ function FeedbackChart({
     if (data.length > 0 && name === data[0].name) placedLabels = [];
     const revenue = data.find((d) => d.name === name)?.revenue ?? 0;
     const shortName = name.length > 14 ? `${name.slice(0, 13)}…` : name;
+    const conflicts = (yy: number) =>
+      placedLabels.some((p) => Math.abs(p.x - x) < 200 && Math.abs(p.y - yy) < LABEL_GAP);
     let ly = y;
-    let guard = 0;
-    while (guard++ < 20 && placedLabels.some((p) => Math.abs(p.x - x) < 200 && Math.abs(p.y - ly) < LABEL_GAP)) {
-      ly += LABEL_GAP;
+    if (conflicts(ly)) {
+      for (let k = 1; k <= 10; k++) {
+        const down = y + k * LABEL_GAP;
+        if (down <= 250 && !conflicts(down)) { ly = down; break; }
+        const up = y - k * LABEL_GAP;
+        if (up >= 12 && !conflicts(up)) { ly = up; break; }
+      }
     }
     placedLabels.push({ x, y: ly });
     return (
