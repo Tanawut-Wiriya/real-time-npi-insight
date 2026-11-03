@@ -1430,9 +1430,9 @@ function FeedbackChart({
               <Legend wrapperStyle={{ fontSize: 11 }} />
               <Pie
                 data={data}
-                cx="50%"
+                cx="46%"
                 cy="50%"
-                outerRadius={74}
+                outerRadius={60}
                 dataKey="value"
                 nameKey="name"
                 label={renderLabel}
