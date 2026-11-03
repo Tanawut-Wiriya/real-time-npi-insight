@@ -1365,8 +1365,37 @@ function FeedbackChart({
   };
 
 
-  let placedLabels: { x: number; y: number }[] = [];
-  const LABEL_GAP = 40;
+  // Resolve label overlaps per side (left/right of the pie) so labels stay near their slice.
+  const LABEL_GAP = 38;
+  const labelOffsets = useMemo(() => {
+    const total = data.reduce((s, d) => s + d.value, 0) || 1;
+    const R = 80;
+    let angle = 0;
+    const items = data.map((d) => {
+      const span = (d.value / total) * 360;
+      const mid = ((angle + span / 2) * Math.PI) / 180;
+      angle += span;
+      return { name: d.name, right: Math.cos(mid) >= 0, base: -R * Math.sin(mid) };
+    });
+    const offsets = new Map<string, number>();
+    for (const side of [true, false]) {
+      const group = items.filter((i) => i.right === side).sort((a, b) => a.base - b.base);
+      const placed: number[] = [];
+      for (const it of group) {
+        let y = it.base;
+        if (placed.length && y - placed[placed.length - 1] < LABEL_GAP) {
+          y = placed[placed.length - 1] + LABEL_GAP;
+        }
+        placed.push(y);
+        offsets.set(it.name, y - it.base);
+      }
+      // Re-center the group if pushes drifted it too far down.
+      const shift = group.length ? (placed[placed.length - 1] - group[group.length - 1].base) / 2 : 0;
+      for (const it of group) offsets.set(it.name, (offsets.get(it.name) ?? 0) - shift);
+    }
+    return offsets;
+  }, [data]);
+
   const renderLabel = (props: {
     name?: string;
     value?: number;
@@ -1376,24 +1405,9 @@ function FeedbackChart({
     textAnchor?: "inherit" | "start" | "middle" | "end";
   }) => {
     const { name = "", value = 0, percent = 0, x = 0, y = 0, textAnchor = "middle" } = props;
-    if (data.length > 0 && name === data[0].name) placedLabels = [];
     const revenue = data.find((d) => d.name === name)?.revenue ?? 0;
     const shortName = name.length > 14 ? `${name.slice(0, 13)}…` : name;
-    const isRight = textAnchor === "start";
-    const conflicts = (yy: number) =>
-      placedLabels.some(
-        (p) => p.right === isRight && Math.abs(p.x - x) < 50 && Math.abs(p.y - yy) < LABEL_GAP,
-      );
-    let ly = y;
-    if (conflicts(ly)) {
-      for (let k = 1; k <= 10; k++) {
-        const down = y + k * LABEL_GAP;
-        if (down <= 250 && !conflicts(down)) { ly = down; break; }
-        const up = y - k * LABEL_GAP;
-        if (up >= 12 && !conflicts(up)) { ly = up; break; }
-      }
-    }
-    placedLabels.push({ x, y: ly });
+    const ly = Math.min(250, Math.max(12, y + (labelOffsets.get(name) ?? 0)));
     return (
       <text x={x} y={ly} textAnchor={textAnchor} fill="var(--foreground)" fontSize={11}>
         <tspan x={x} dy="-0.3em">{shortName}</tspan>
