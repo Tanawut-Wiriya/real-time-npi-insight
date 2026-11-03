@@ -1545,10 +1545,9 @@ function DeliveredShipmentChart({
               <Legend wrapperStyle={{ fontSize: 11 }} />
               <Pie
                 data={data as unknown as Array<{ name: string; value: number; color: string; key: string }>}
-                cx="50%"
+                cx="46%"
                 cy="50%"
-                innerRadius={50}
-                outerRadius={80}
+                outerRadius={60}
                 dataKey="value"
                 nameKey="name"
                 label={PieSliceLabel}
