@@ -1421,7 +1421,7 @@ function FeedbackChart({
     const ly = Math.min(250, Math.max(12, y + (labelOffsets.get(name) ?? 0)));
     return (
       <text x={x} y={ly} textAnchor={textAnchor} fill="var(--foreground)" fontSize={11}>
-        <tspan x={x} dy="-0.3em">{shortName}</tspan>
+        <tspan x={x} dy="-0.3em" fill={getFeedbackColor(name)}>{shortName}</tspan>
         <tspan x={x} dy="1.15em">{`${value.toLocaleString()} (${(percent * 100).toFixed(0)}%)`}</tspan>
         <tspan x={x} dy="1.15em" fill="var(--muted-foreground)">
           {formatUsd(revenue)}
