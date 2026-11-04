@@ -1105,7 +1105,7 @@ function StatusPieChart({
                 outerRadius={60}
                 dataKey="value"
                 nameKey="name"
-                label={PieSliceLabel}
+                label={statusLabel}
                 labelLine
                 onClick={(entry: { name?: string }) => {
                   if (onDrill && entry?.name) onDrill(entry.name);
