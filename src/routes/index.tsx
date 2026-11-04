@@ -1575,7 +1575,7 @@ function DeliveredShipmentChart({
                 outerRadius={60}
                 dataKey="value"
                 nameKey="name"
-                label={PieSliceLabel}
+                label={otdLabel}
                 labelLine
               >
                 {data.map((entry) => (
