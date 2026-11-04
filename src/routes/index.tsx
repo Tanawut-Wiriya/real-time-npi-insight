@@ -1017,6 +1017,7 @@ function PieSliceLabel({
   x = 0,
   y = 0,
   textAnchor = "middle",
+  nameColor,
 }: {
   name?: string;
   value?: number;
@@ -1024,11 +1025,12 @@ function PieSliceLabel({
   x?: number;
   y?: number;
   textAnchor?: "inherit" | "start" | "middle" | "end";
+  nameColor?: string;
 }) {
   const shortName = name.length > 14 ? `${name.slice(0, 13)}…` : name;
   return (
     <text x={x} y={y} textAnchor={textAnchor} fill="var(--foreground)" fontSize={11}>
-      <tspan x={x} dy="-0.3em">{shortName}</tspan>
+      <tspan x={x} dy="-0.3em" fill={nameColor}>{shortName}</tspan>
       <tspan x={x} dy="1.15em">{`${value.toLocaleString()} (${(percent * 100).toFixed(0)}%)`}</tspan>
     </text>
   );
@@ -1060,6 +1062,15 @@ function StatusPieChart({
     if (v === "partialdelivered") return "#86efac";
     return "var(--chart-1)";
   };
+
+  const statusLabel = (props: {
+    name?: string;
+    value?: number;
+    percent?: number;
+    x?: number;
+    y?: number;
+    textAnchor?: "inherit" | "start" | "middle" | "end";
+  }) => <PieSliceLabel {...props} nameColor={getStatusColor(props.name ?? "")} />;
 
   return (
     <Card className="p-4">
@@ -1094,7 +1105,7 @@ function StatusPieChart({
                 outerRadius={60}
                 dataKey="value"
                 nameKey="name"
-                label={PieSliceLabel}
+                label={statusLabel}
                 labelLine
                 onClick={(entry: { name?: string }) => {
                   if (onDrill && entry?.name) onDrill(entry.name);
@@ -1410,7 +1421,7 @@ function FeedbackChart({
     const ly = Math.min(250, Math.max(12, y + (labelOffsets.get(name) ?? 0)));
     return (
       <text x={x} y={ly} textAnchor={textAnchor} fill="var(--foreground)" fontSize={11}>
-        <tspan x={x} dy="-0.3em">{shortName}</tspan>
+        <tspan x={x} dy="-0.3em" fill={getFeedbackColor(name)}>{shortName}</tspan>
         <tspan x={x} dy="1.15em">{`${value.toLocaleString()} (${(percent * 100).toFixed(0)}%)`}</tspan>
         <tspan x={x} dy="1.15em" fill="var(--muted-foreground)">
           {formatUsd(revenue)}
@@ -1515,6 +1526,20 @@ function DeliveredShipmentChart({
 
   const total = rows.length;
 
+  const otdLabel = (props: {
+    name?: string;
+    value?: number;
+    percent?: number;
+    x?: number;
+    y?: number;
+    textAnchor?: "inherit" | "start" | "middle" | "end";
+  }) => (
+    <PieSliceLabel
+      {...props}
+      nameColor={data.find((d) => d.name === props.name)?.color}
+    />
+  );
+
   return (
     <Card className="p-4">
       <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
@@ -1550,7 +1575,7 @@ function DeliveredShipmentChart({
                 outerRadius={60}
                 dataKey="value"
                 nameKey="name"
-                label={PieSliceLabel}
+                label={otdLabel}
                 labelLine
               >
                 {data.map((entry) => (
