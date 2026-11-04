@@ -1526,6 +1526,20 @@ function DeliveredShipmentChart({
 
   const total = rows.length;
 
+  const otdLabel = (props: {
+    name?: string;
+    value?: number;
+    percent?: number;
+    x?: number;
+    y?: number;
+    textAnchor?: "inherit" | "start" | "middle" | "end";
+  }) => (
+    <PieSliceLabel
+      {...props}
+      nameColor={data.find((d) => d.name === props.name)?.color}
+    />
+  );
+
   return (
     <Card className="p-4">
       <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
