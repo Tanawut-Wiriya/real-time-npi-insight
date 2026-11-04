@@ -1017,6 +1017,7 @@ function PieSliceLabel({
   x = 0,
   y = 0,
   textAnchor = "middle",
+  nameColor,
 }: {
   name?: string;
   value?: number;
@@ -1024,11 +1025,12 @@ function PieSliceLabel({
   x?: number;
   y?: number;
   textAnchor?: "inherit" | "start" | "middle" | "end";
+  nameColor?: string;
 }) {
   const shortName = name.length > 14 ? `${name.slice(0, 13)}…` : name;
   return (
     <text x={x} y={y} textAnchor={textAnchor} fill="var(--foreground)" fontSize={11}>
-      <tspan x={x} dy="-0.3em">{shortName}</tspan>
+      <tspan x={x} dy="-0.3em" fill={nameColor}>{shortName}</tspan>
       <tspan x={x} dy="1.15em">{`${value.toLocaleString()} (${(percent * 100).toFixed(0)}%)`}</tspan>
     </text>
   );
