@@ -1063,6 +1063,15 @@ function StatusPieChart({
     return "var(--chart-1)";
   };
 
+  const statusLabel = (props: {
+    name?: string;
+    value?: number;
+    percent?: number;
+    x?: number;
+    y?: number;
+    textAnchor?: "inherit" | "start" | "middle" | "end";
+  }) => <PieSliceLabel {...props} nameColor={getStatusColor(props.name ?? "")} />;
+
   return (
     <Card className="p-4">
       <div className="mb-3">
