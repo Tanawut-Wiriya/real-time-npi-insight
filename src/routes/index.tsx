@@ -1102,7 +1102,7 @@ function StatusPieChart({
                 data={data}
                 cx="46%"
                 cy="50%"
-                outerRadius={60}
+                outerRadius={63}
                 dataKey="value"
                 nameKey="name"
                 label={statusLabel}
@@ -1466,7 +1466,7 @@ function FeedbackChart({
                 data={data}
                 cx="46%"
                 cy="50%"
-                outerRadius={60}
+                outerRadius={63}
                 dataKey="value"
                 nameKey="name"
                 label={renderLabel}
@@ -1572,7 +1572,7 @@ function DeliveredShipmentChart({
                 data={data as unknown as Array<{ name: string; value: number; color: string; key: string }>}
                 cx="46%"
                 cy="50%"
-                outerRadius={60}
+                outerRadius={63}
                 dataKey="value"
                 nameKey="name"
                 label={otdLabel}
