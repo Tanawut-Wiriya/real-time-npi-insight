@@ -68,9 +68,17 @@ const APPROVAL_OPTIONS = [
   "Stop Business",
 ];
 import { Card } from "@/components/ui/card";
+import { getRecentApprovals } from "@/lib/recent-approvals.functions";
+import { isRecentlyApproved } from "@/lib/recent-approvals";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+
+const recentApprovalsQuery = queryOptions({
+  queryKey: ["recent-approvals"],
+  queryFn: () => getRecentApprovals(),
+  staleTime: 60_000,
+});
 
 const npiQuery = queryOptions({
   queryKey: ["npi-data"],
@@ -331,6 +339,19 @@ function Dashboard() {
     () => yearRows.filter((r) => /^w\.?customer$/i.test(r.CustomerFeedback.trim())),
     [yearRows],
   );
+  const { data: recentApprovals = [] } = useQuery(recentApprovalsQuery);
+  const recentApprovalMap = useMemo(() => {
+    const m = new Map<number, string>();
+    for (const a of recentApprovals) m.set(a.row_no, a.approved_at);
+    return m;
+  }, [recentApprovals]);
+  const waitApprovalModalRows = useMemo(() => {
+    const recent = yearRows.filter((r) => {
+      const at = recentApprovalMap.get(r.No);
+      return at ? isRecentlyApproved(at, r.CustomerFeedback) : false;
+    });
+    return [...waitApprovalRows, ...recent];
+  }, [yearRows, waitApprovalRows, recentApprovalMap]);
   const waitApprovalCount = waitApprovalRows.length;
   const waitApprovalQty = waitApprovalRows.reduce((s, r) => s + r.Quantity, 0);
 
@@ -646,7 +667,8 @@ function Dashboard() {
       {showWaitApproval && (
         <StatusDrilldownModal
           status="Wait Approval (w.customer)"
-          rows={waitApprovalRows}
+          rows={waitApprovalModalRows}
+          recentApprovals={recentApprovalMap}
           showFeedbackRemark
           onClose={() => setShowWaitApproval(false)}
         />
@@ -1133,11 +1155,13 @@ function StatusDrilldownModal({
   rows,
   onClose,
   showFeedbackRemark = false,
+  recentApprovals,
 }: {
   status: string;
   rows: NpiRow[];
   onClose: () => void;
   showFeedbackRemark?: boolean;
+  recentApprovals?: Map<number, string>;
 }) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [feedbackDraft, setFeedbackDraft] = useState("");
@@ -1165,7 +1189,10 @@ function StatusDrilldownModal({
       setFeedbackDraft("");
       setRemarkDraft("");
       setSaveNotice(`บันทึกแถว ${editingRow.No} และตรวจสอบข้อมูลจาก Google Sheet แล้ว`);
-      await queryClient.invalidateQueries({ queryKey: ["npi-data"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["npi-data"] }),
+        queryClient.invalidateQueries({ queryKey: ["recent-approvals"] }),
+      ]);
     } catch {
       setSaveError("ยังยืนยันการบันทึกไม่ได้ กรุณารีเฟรชเพื่อตรวจสอบข้อมูลก่อนลองใหม่");
     } finally {
@@ -1266,8 +1293,12 @@ function StatusDrilldownModal({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {rows.map((r, index) => (
-                  <TableRow key={r.No} className="text-sm">
+                {rows.map((r, index) => {
+                  const approvedAt = recentApprovals?.get(r.No);
+                  const isRecent = !!approvedAt && isRecentlyApproved(approvedAt, r.CustomerFeedback);
+                  const daysLeft = approvedAt ? Math.max(1, 7 - Math.floor((Date.now() - Date.parse(approvedAt)) / 86_400_000)) : 0;
+                  return (
+                  <TableRow key={r.No} className={isRecent ? "bg-success/10 text-sm hover:bg-success/15" : "text-sm"}>
                     <TableCell className="font-mono text-xs text-muted-foreground">{r.No}</TableCell>
                     <TableCell className="font-medium">{r.Product}</TableCell>
                     <TableCell className="font-mono text-xs">{r.Article}</TableCell>
@@ -1289,7 +1320,14 @@ function StatusDrilldownModal({
                             </SelectContent>
                           </Select>
                         ) : (
-                          <Badge variant="outline">{r.CustomerFeedback || "-"}</Badge>
+                          <div className="flex flex-col items-start gap-1">
+                            <Badge variant="outline">{r.CustomerFeedback || "-"}</Badge>
+                            {isRecent && (
+                              <span className="whitespace-nowrap text-[11px] font-medium text-success">
+                                ✓ เพิ่งบันทึก · แสดงอีก {daysLeft} วัน
+                              </span>
+                            )}
+                          </div>
                         )
                       ) : <DeliveryBadge value={r.Delivery} />}
                     </TableCell>
@@ -1332,7 +1370,8 @@ function StatusDrilldownModal({
                       </>
                     )}
                   </TableRow>
-                ))}
+                  );
+                })}
               </TableBody>
             </Table>
           )}
