@@ -3,4 +3,7 @@
 - [x] Add per-row editing restricted to Customer feedback and Remark customer feedback.
 - [x] Add a passcode confirmation when saving Wait Approval changes without storing the passcode.
 - [x] Connect saving to the deployed Apps Script contract; require verified read-back before reporting success.
-- [ ] Verify a real authorized save to Google Sheet — requires the user to enter WRITE_TOKEN in the app; no live credential available for testing.- [x] เปลี่ยน favicon เป็นโลโก้ NPI
+- [ ] Verify a real authorized save to Google Sheet — requires the user to enter WRITE_TOKEN in the app; no live credential available for testing.
+- [x] Keep rows in their source order after Approval changes.
+- [x] Use gray highlights for recently changed Update version, Reject, and Stop Business rows.
+- [x] เปลี่ยน favicon เป็นโลโก้ NPI

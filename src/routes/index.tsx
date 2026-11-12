@@ -69,7 +69,7 @@ const APPROVAL_OPTIONS = [
 ];
 import { Card } from "@/components/ui/card";
 import { getRecentApprovals } from "@/lib/recent-approvals.functions";
-import { isRecentlyApproved } from "@/lib/recent-approvals";
+import { isRecentlyApproved, isWaitingFeedback } from "@/lib/recent-approvals";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -346,12 +346,12 @@ function Dashboard() {
     return m;
   }, [recentApprovals]);
   const waitApprovalModalRows = useMemo(() => {
-    const recent = yearRows.filter((r) => {
+    return yearRows.filter((r) => {
+      if (isWaitingFeedback(r.CustomerFeedback)) return true;
       const at = recentApprovalMap.get(r.No);
       return at ? isRecentlyApproved(at, r.CustomerFeedback) : false;
     });
-    return [...waitApprovalRows, ...recent];
-  }, [yearRows, waitApprovalRows, recentApprovalMap]);
+  }, [yearRows, recentApprovalMap]);
   const waitApprovalCount = waitApprovalRows.length;
   const waitApprovalQty = waitApprovalRows.reduce((s, r) => s + r.Quantity, 0);
 
@@ -1297,8 +1297,9 @@ function StatusDrilldownModal({
                   const approvedAt = recentApprovals?.get(r.No);
                   const isRecent = !!approvedAt && isRecentlyApproved(approvedAt, r.CustomerFeedback);
                   const daysLeft = approvedAt ? Math.max(1, 7 - Math.floor((Date.now() - Date.parse(approvedAt)) / 86_400_000)) : 0;
+                  const isMutedRecent = ["update version", "reject", "stop business"].includes(r.CustomerFeedback.trim().toLowerCase());
                   return (
-                  <TableRow key={r.No} className={isRecent ? "bg-success/10 text-sm hover:bg-success/15" : "text-sm"}>
+                  <TableRow key={r.No} className={isRecent ? isMutedRecent ? "bg-muted/70 text-sm hover:bg-muted" : "bg-success/10 text-sm hover:bg-success/15" : "text-sm"}>
                     <TableCell className="font-mono text-xs text-muted-foreground">{r.No}</TableCell>
                     <TableCell className="font-medium">{r.Product}</TableCell>
                     <TableCell className="font-mono text-xs">{r.Article}</TableCell>
