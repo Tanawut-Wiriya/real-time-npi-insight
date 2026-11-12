@@ -341,15 +341,15 @@ function Dashboard() {
   );
   const { data: recentApprovals = [] } = useQuery(recentApprovalsQuery);
   const recentApprovalMap = useMemo(() => {
-    const m = new Map<number, string>();
-    for (const a of recentApprovals) m.set(a.row_no, a.approved_at);
+    const m = new Map<number, { at: string; kind: string }>();
+    for (const a of recentApprovals) m.set(a.row_no, { at: a.approved_at, kind: a.kind });
     return m;
   }, [recentApprovals]);
   const waitApprovalModalRows = useMemo(() => {
     return yearRows.filter((r) => {
       if (isWaitingFeedback(r.CustomerFeedback)) return true;
-      const at = recentApprovalMap.get(r.No);
-      return at ? isRecentlyApproved(at, r.CustomerFeedback) : false;
+      const rec = recentApprovalMap.get(r.No);
+      return rec ? isRecentlyApproved(rec.at, r.CustomerFeedback) : false;
     });
   }, [yearRows, recentApprovalMap]);
   const waitApprovalCount = waitApprovalRows.length;
@@ -1161,7 +1161,7 @@ function StatusDrilldownModal({
   rows: NpiRow[];
   onClose: () => void;
   showFeedbackRemark?: boolean;
-  recentApprovals?: Map<number, string>;
+  recentApprovals?: Map<number, { at: string; kind: string }>;
 }) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [feedbackDraft, setFeedbackDraft] = useState("");
@@ -1294,12 +1294,14 @@ function StatusDrilldownModal({
               </TableHeader>
               <TableBody>
                 {rows.map((r, index) => {
-                  const approvedAt = recentApprovals?.get(r.No);
-                  const isRecent = !!approvedAt && isRecentlyApproved(approvedAt, r.CustomerFeedback);
+                  const rec = recentApprovals?.get(r.No);
+                  const approvedAt = rec?.at;
+                  const isRemarkEdit = !!rec && rec.kind === "remark" && isWaitingFeedback(r.CustomerFeedback) && isRecentlyApproved(rec.at, "remark");
+                  const isRecent = isRemarkEdit || (!!approvedAt && isRecentlyApproved(approvedAt, r.CustomerFeedback));
                   const daysLeft = approvedAt ? Math.max(1, 7 - Math.floor((Date.now() - Date.parse(approvedAt)) / 86_400_000)) : 0;
                   const isMutedRecent = ["update version", "reject", "stop business"].includes(r.CustomerFeedback.trim().toLowerCase());
                   return (
-                  <TableRow key={r.No} className={isRecent ? isMutedRecent ? "bg-foreground/15 text-sm hover:bg-foreground/20" : "bg-success/10 text-sm hover:bg-success/15" : "text-sm"}>
+                  <TableRow key={r.No} className={isRemarkEdit ? "bg-info/15 text-sm hover:bg-info/20" : isRecent ? isMutedRecent ? "bg-foreground/15 text-sm hover:bg-foreground/20" : "bg-success/10 text-sm hover:bg-success/15" : "text-sm"}>
                     <TableCell className="font-mono text-xs text-muted-foreground">{r.No}</TableCell>
                     <TableCell className="font-medium">{r.Product}</TableCell>
                     <TableCell className="font-mono text-xs">{r.Article}</TableCell>
@@ -1324,7 +1326,7 @@ function StatusDrilldownModal({
                           <div className="flex flex-col items-start gap-1">
                             <Badge variant="outline">{r.CustomerFeedback || "-"}</Badge>
                             {isRecent && (
-                              <span className="whitespace-nowrap text-[11px] font-medium text-success">
+                              <span className={`whitespace-nowrap text-[11px] font-medium ${isRemarkEdit ? "text-info" : "text-success"}`}>
                                 ✓ เพิ่งบันทึก · แสดงอีก {daysLeft} วัน
                               </span>
                             )}

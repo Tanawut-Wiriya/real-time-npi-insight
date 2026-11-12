@@ -18,16 +18,19 @@ export type Database = {
         Row: {
           approved_at: string
           feedback: string
+          kind: string
           row_no: number
         }
         Insert: {
           approved_at?: string
           feedback?: string
+          kind?: string
           row_no: number
         }
         Update: {
           approved_at?: string
           feedback?: string
+          kind?: string
           row_no?: number
         }
         Relationships: []

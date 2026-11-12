@@ -1,0 +1,1 @@
+ALTER TABLE public.recent_approvals ADD COLUMN IF NOT EXISTS kind TEXT NOT NULL DEFAULT 'approval';
