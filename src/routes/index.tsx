@@ -1301,7 +1301,7 @@ function StatusDrilldownModal({
                   const daysLeft = approvedAt ? Math.max(1, 7 - Math.floor((Date.now() - Date.parse(approvedAt)) / 86_400_000)) : 0;
                   const isMutedRecent = ["update version", "reject", "stop business"].includes(r.CustomerFeedback.trim().toLowerCase());
                   return (
-                  <TableRow key={r.No} className={isRemarkEdit ? "bg-info/15 text-sm hover:bg-info/20" : isRecent ? isMutedRecent ? "bg-foreground/15 text-sm hover:bg-foreground/20" : "bg-success/10 text-sm hover:bg-success/15" : "text-sm"}>
+                  <TableRow key={r.No} className={isRemarkEdit ? "bg-info/25 text-sm hover:bg-info/30" : isRecent ? isMutedRecent ? "bg-foreground/15 text-sm hover:bg-foreground/20" : "bg-success/10 text-sm hover:bg-success/15" : "text-sm"}>
                     <TableCell className="font-mono text-xs text-muted-foreground">{r.No}</TableCell>
                     <TableCell className="font-medium">{r.Product}</TableCell>
                     <TableCell className="font-mono text-xs">{r.Article}</TableCell>
@@ -1325,7 +1325,7 @@ function StatusDrilldownModal({
                         ) : (
                           <div className="flex flex-col items-start gap-1">
                             <Badge variant="outline">{r.CustomerFeedback || "-"}</Badge>
-                            {isRecent && (
+                            {isRecent && !isRemarkEdit && (
                               <span className={`whitespace-nowrap text-[11px] font-medium ${isRemarkEdit ? "text-info" : "text-success"}`}>
                                 ✓ เพิ่งบันทึก · แสดงอีก {daysLeft} วัน
                               </span>
@@ -1347,7 +1347,16 @@ function StatusDrilldownModal({
                               maxLength={5000}
                               className="min-w-52"
                             />
-                            ) : <span className="block whitespace-normal [overflow-wrap:anywhere]">{r.FeedbackRemark || "-"}</span>}
+                            ) : (
+                              <>
+                                <span className="block whitespace-normal [overflow-wrap:anywhere]">{r.FeedbackRemark || "-"}</span>
+                                {isRemarkEdit && (
+                                  <span className="mt-1 block text-[11px] font-medium text-info">
+                                    ✓ เพิ่งบันทึก · แสดงอีก {daysLeft} วัน
+                                  </span>
+                                )}
+                              </>
+                            )}
                         </TableCell>
                         <TableCell>
                           {editingIndex === index ? (
