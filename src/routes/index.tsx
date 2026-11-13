@@ -1327,7 +1327,7 @@ function StatusDrilldownModal({
                             <Badge variant="outline">{r.CustomerFeedback || "-"}</Badge>
                             {isRecent && !isRemarkEdit && (
                               <span className={`whitespace-nowrap text-[11px] font-medium ${isRemarkEdit ? "text-info" : "text-success"}`}>
-                                ✓ เพิ่งบันทึก · แสดงอีก {daysLeft} วัน
+                                ✓ Status updated · Visible for {daysLeft} {daysLeft === 1 ? "day" : "days"}
                               </span>
                             )}
                           </div>
@@ -1352,7 +1352,7 @@ function StatusDrilldownModal({
                                 <span className="block whitespace-normal [overflow-wrap:anywhere]">{r.FeedbackRemark || "-"}</span>
                                 {isRemarkEdit && (
                                   <span className="mt-1 block text-[11px] font-medium text-info">
-                                    ✓ เพิ่งบันทึก · แสดงอีก {daysLeft} วัน
+                                    ✓ Remark updated · Visible for {daysLeft} {daysLeft === 1 ? "day" : "days"}
                                   </span>
                                 )}
                               </>
