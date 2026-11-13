@@ -1301,7 +1301,7 @@ function StatusDrilldownModal({
                   const daysLeft = approvedAt ? Math.max(1, 7 - Math.floor((Date.now() - Date.parse(approvedAt)) / 86_400_000)) : 0;
                   const isMutedRecent = ["update version", "reject", "stop business"].includes(r.CustomerFeedback.trim().toLowerCase());
                   return (
-                  <TableRow key={r.No} className={isRemarkEdit ? "bg-info/25 text-sm hover:bg-info/30" : isRecent ? isMutedRecent ? "bg-foreground/15 text-sm hover:bg-foreground/20" : "bg-success/10 text-sm hover:bg-success/15" : "text-sm"}>
+                  <TableRow key={r.No} className={isRemarkEdit ? "bg-info/20 text-sm hover:bg-info/25" : isRecent ? isMutedRecent ? "bg-foreground/15 text-sm hover:bg-foreground/20" : "bg-success/10 text-sm hover:bg-success/15" : "text-sm"}>
                     <TableCell className="font-mono text-xs text-muted-foreground">{r.No}</TableCell>
                     <TableCell className="font-medium">{r.Product}</TableCell>
                     <TableCell className="font-mono text-xs">{r.Article}</TableCell>
